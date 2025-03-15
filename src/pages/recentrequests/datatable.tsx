@@ -168,7 +168,10 @@ export default function DataTable({ onRowClick }: DataTableProps) {
   const filteredRows = Array.isArray(rows) 
     ? rows.filter(row =>
         row.fullName.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        row.requestId.includes(searchTerm)
+        row.requestId.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        row.aidType.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        row.processStatus.toLowerCase().includes(searchTerm.toLowerCase())||
+        row.createdOn.toLowerCase().includes(searchTerm.toLowerCase())
       )
     : [];
 

@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Box, Typography, Button, Grid, TextField, Tabs, Tab } from '@mui/material';
+import { Box, Typography, Button, Grid, TextField, Tabs, Tab, Alert, Snackbar } from '@mui/material';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import { LocalizationProvider, DatePicker } from '@mui/x-date-pickers';
 import AppConfig from '../../AppConfig';
@@ -168,10 +168,8 @@ export default function AddMemberDetails({ member, onBack, onSubmit }: AddMember
       basicErrors.Email = 'Invalid email format';
     }
     if (!formData.basicDetails.MobileNumber.trim()) {
-      basicErrors.MobileNumber = 'Mobile Number is required';
-    } else if (!/^\d{10}$/.test(formData.basicDetails.MobileNumber)) {
-      basicErrors.MobileNumber = 'Mobile Number must be 10 digits';
-    }
+      basicErrors.MobileNumber = 'Mobile Number is required11';
+    } 
     if (!formData.basicDetails.DOB) {
       basicErrors.DOB = 'Date of Birth is required';
     }
@@ -445,12 +443,14 @@ export default function AddMemberDetails({ member, onBack, onSubmit }: AddMember
       }
     }));
   };
-
+  const handleCloseSnackbar = () => {
+    setOpenSnackbar(false);
+  };
   return (
     <Box sx={{ height: '100%', display: 'flex', flexDirection: 'column' }}>
-      <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
+      <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2, mr: 5}}>
         <Button onClick={onBack}>← Back</Button>
-        <Typography variant="h5">Add Member Details</Typography>
+        <Typography variant="h5" >Add Member Details</Typography>
       </Box>
 
       <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
@@ -464,7 +464,20 @@ export default function AddMemberDetails({ member, onBack, onSubmit }: AddMember
           <Tab label="Passport Details" />
         </Tabs>
       </Box>
-
+      <Snackbar
+        open={openSnackbar}
+        autoHideDuration={6000}
+        onClose={handleCloseSnackbar}
+        anchorOrigin={{ vertical: 'top', horizontal: 'center' }}
+      >
+        <Alert 
+          onClose={handleCloseSnackbar} 
+          severity="error" 
+          sx={{ width: '100%' }}
+        >
+          {snackbarMessage}
+        </Alert>
+      </Snackbar>
       <Box component="form" onSubmit={handleSubmit} sx={{ flexGrow: 1, overflow: 'auto', p: 3 }}>
         {activeTab === 0 && (
           <Grid container spacing={3}>
@@ -474,6 +487,9 @@ export default function AddMemberDetails({ member, onBack, onSubmit }: AddMember
                 label="Full Name"
                 value={formData.basicDetails.FullName}
                 onChange={handleChange('basicDetails', 'FullName')}
+                error={!!errors.FullName}
+                helperText={errors.FullName}
+                disabled
               />
             </Grid>
             <Grid item xs={12} md={6}>
@@ -482,6 +498,9 @@ export default function AddMemberDetails({ member, onBack, onSubmit }: AddMember
                 label="Email"
                 value={formData.basicDetails.Email}
                 onChange={handleChange('basicDetails', 'Email')}
+                error={!!errors.Email}
+                helperText={errors.Email}
+                disabled
               />
             </Grid>
             <Grid item xs={12} md={6}>
@@ -490,6 +509,9 @@ export default function AddMemberDetails({ member, onBack, onSubmit }: AddMember
                 label="Mobile Number"
                 value={formData.basicDetails.MobileNumber}
                 onChange={handleChange('basicDetails', 'MobileNumber')}
+                // error={!!errors.MobileNumber}
+                // helperText={errors.MobileNumber}
+                disabled
               />
             </Grid>
             <Grid item xs={12} md={6}>
@@ -497,6 +519,7 @@ export default function AddMemberDetails({ member, onBack, onSubmit }: AddMember
                 <DatePicker
                   label="Date of Birth"
                   value={formData.basicDetails.DOB}
+              
                   onChange={(newValue) => {
                     setFormData(prev => ({
                       ...prev,
@@ -506,6 +529,8 @@ export default function AddMemberDetails({ member, onBack, onSubmit }: AddMember
                       }
                     }));
                   }}
+                 
+       
                 />
               </LocalizationProvider>
             </Grid>
@@ -515,6 +540,8 @@ export default function AddMemberDetails({ member, onBack, onSubmit }: AddMember
                 label="Current Location"
                 value={formData.basicDetails.CurrentLocation}
                 onChange={handleChange('basicDetails', 'CurrentLocation')}
+                error={!!errors.CurrentLocation}
+                helperText={errors.CurrentLocation}
               />
             </Grid>
           </Grid>
@@ -528,6 +555,9 @@ export default function AddMemberDetails({ member, onBack, onSubmit }: AddMember
                 label="Native Address"
                 value={formData.nativeDetails.NativeAddress}
                 onChange={handleChange('nativeDetails', 'NativeAddress')}
+                error={!!errors.NativeAddress}
+                helperText={errors.NativeAddress}
+                
               />
             </Grid>
             <Grid item xs={12} md={6}>
@@ -536,6 +566,8 @@ export default function AddMemberDetails({ member, onBack, onSubmit }: AddMember
                 label="Native City"
                 value={formData.nativeDetails.NativeCity}
                 onChange={handleChange('nativeDetails', 'NativeCity')}
+                error={!!errors.NativeCity}
+                helperText={errors.NativeCity}
               />
             </Grid>
             <Grid item xs={12} md={6}>
@@ -544,6 +576,8 @@ export default function AddMemberDetails({ member, onBack, onSubmit }: AddMember
                 label="Native State"
                 value={formData.nativeDetails.NativeState}
                 onChange={handleChange('nativeDetails', 'NativeState')}
+                error={!!errors.NativeState}
+                helperText={errors.NativeState}
               />
             </Grid>
             <Grid item xs={12} md={6}>
@@ -552,6 +586,8 @@ export default function AddMemberDetails({ member, onBack, onSubmit }: AddMember
                 label="Native Pin Code"
                 value={formData.nativeDetails.NativePinCode}
                 onChange={handleChange('nativeDetails', 'NativePinCode')}
+                error={!!errors.NativePinCode}
+                helperText={errors.NativePinCode}
               />
             </Grid>
             <Grid item xs={12} md={6}>
@@ -560,6 +596,8 @@ export default function AddMemberDetails({ member, onBack, onSubmit }: AddMember
                 label="Contact Person Name"
                 value={formData.nativeDetails.NativeContactPersonName}
                 onChange={handleChange('nativeDetails', 'NativeContactPersonName')}
+                error={!!errors.NativeContactPersonName}
+                helperText={errors.NativeContactPersonName}
               />
             </Grid>
             <Grid item xs={12} md={6}>
@@ -568,6 +606,8 @@ export default function AddMemberDetails({ member, onBack, onSubmit }: AddMember
                 label="Contact Person Phone"
                 value={formData.nativeDetails.NativeContactPersonPhone}
                 onChange={handleChange('nativeDetails', 'NativeContactPersonPhone')}
+                error={!!errors.NativeContactPersonPhone}
+                helperText={errors.NativeContactPersonPhone}
               />
             </Grid>
           </Grid>
@@ -581,6 +621,8 @@ export default function AddMemberDetails({ member, onBack, onSubmit }: AddMember
                 label="Work Address"
                 value={formData.malaysiaWorkDetails.MalaysiaWorkAddress}
                 onChange={handleChange('malaysiaWorkDetails', 'MalaysiaWorkAddress')}
+                error={!!errors.MalaysiaWorkAddress}
+                helperText={errors.MalaysiaWorkAddress}
               />
             </Grid>
             <Grid item xs={12} md={6}>
@@ -589,6 +631,8 @@ export default function AddMemberDetails({ member, onBack, onSubmit }: AddMember
                 label="City"
                 value={formData.malaysiaWorkDetails.MalaysiaCity}
                 onChange={handleChange('malaysiaWorkDetails', 'MalaysiaCity')}
+                error={!!errors.MalaysiaCity}
+                helperText={errors.MalaysiaCity}
               />
             </Grid>
             <Grid item xs={12} md={6}>
@@ -597,6 +641,8 @@ export default function AddMemberDetails({ member, onBack, onSubmit }: AddMember
                 label="State"
                 value={formData.malaysiaWorkDetails.MalaysiaState}
                 onChange={handleChange('malaysiaWorkDetails', 'MalaysiaState')}
+                error={!!errors.MalaysiaState}
+                helperText={errors.MalaysiaState}
               />
             </Grid>
             <Grid item xs={12} md={6}>
@@ -605,6 +651,8 @@ export default function AddMemberDetails({ member, onBack, onSubmit }: AddMember
                 label="Pin Code"
                 value={formData.malaysiaWorkDetails.MalaysiaPinCode}
                 onChange={handleChange('malaysiaWorkDetails', 'MalaysiaPinCode')}
+                error={!!errors.MalaysiaPinCode}
+                helperText={errors.MalaysiaPinCode}
               />
             </Grid>
             <Grid item xs={12} md={6}>
@@ -613,6 +661,8 @@ export default function AddMemberDetails({ member, onBack, onSubmit }: AddMember
                 label="Contact Person Name"
                 value={formData.malaysiaWorkDetails.MalaysiaWorkContactPersonName}
                 onChange={handleChange('malaysiaWorkDetails', 'MalaysiaWorkContactPersonName')}
+                error={!!errors.MalaysiaWorkContactPersonName}
+                helperText={errors.MalaysiaWorkContactPersonName}
               />
             </Grid>
             <Grid item xs={12} md={6}>
@@ -621,6 +671,8 @@ export default function AddMemberDetails({ member, onBack, onSubmit }: AddMember
                 label="Contact Person Phone"
                 value={formData.malaysiaWorkDetails.MalaysiaWorkContactPersonPhone}
                 onChange={handleChange('malaysiaWorkDetails', 'MalaysiaWorkContactPersonPhone')}
+                error={!!errors.MalaysiaWorkContactPersonPhone}
+                helperText={errors.MalaysiaWorkContactPersonPhone}
               />
             </Grid>
           </Grid>
@@ -634,6 +686,8 @@ export default function AddMemberDetails({ member, onBack, onSubmit }: AddMember
                 label="Malaysia Address"
                 value={formData.malaysiaResidenceDetails.MalaysiaAddress}
                 onChange={handleChange('malaysiaResidenceDetails', 'MalaysiaAddress')}
+                error={!!errors.MalaysiaAddress}
+                helperText={errors.MalaysiaAddress}
               />
             </Grid>
             <Grid item xs={12} md={6}>
@@ -642,6 +696,8 @@ export default function AddMemberDetails({ member, onBack, onSubmit }: AddMember
                 label="Residence City"
                 value={formData.malaysiaResidenceDetails.MalaysiaResidenceCity}
                 onChange={handleChange('malaysiaResidenceDetails', 'MalaysiaResidenceCity')}
+                error={!!errors.MalaysiaResidenceCity}
+                helperText={errors.MalaysiaResidenceCity}
               />
             </Grid>
             <Grid item xs={12} md={6}>
@@ -650,6 +706,8 @@ export default function AddMemberDetails({ member, onBack, onSubmit }: AddMember
                 label="Residence State"
                 value={formData.malaysiaResidenceDetails.MalaysiaResidenceState}
                 onChange={handleChange('malaysiaResidenceDetails', 'MalaysiaResidenceState')}
+                error={!!errors.MalaysiaResidenceState}
+                helperText={errors.MalaysiaResidenceState}
               />
             </Grid>
             <Grid item xs={12} md={6}>
@@ -658,6 +716,8 @@ export default function AddMemberDetails({ member, onBack, onSubmit }: AddMember
                 label="Residence Pin Code"
                 value={formData.malaysiaResidenceDetails.MalaysiaResidencePinCode}
                 onChange={handleChange('malaysiaResidenceDetails', 'MalaysiaResidencePinCode')}
+                error={!!errors.MalaysiaResidencePinCode}
+                helperText={errors.MalaysiaResidencePinCode}
               />
             </Grid>
             <Grid item xs={12} md={6}>
@@ -666,6 +726,8 @@ export default function AddMemberDetails({ member, onBack, onSubmit }: AddMember
                 label="Contact Person Name"
                 value={formData.malaysiaResidenceDetails.MalaysiaContactPersonName}
                 onChange={handleChange('malaysiaResidenceDetails', 'MalaysiaContactPersonName')}
+                error={!!errors.MalaysiaContactPersonName}
+                helperText={errors.MalaysiaContactPersonName}
               />
             </Grid>
             <Grid item xs={12} md={6}>
@@ -674,6 +736,8 @@ export default function AddMemberDetails({ member, onBack, onSubmit }: AddMember
                 label="Contact Person Phone"
                 value={formData.malaysiaResidenceDetails.MalaysiaContactPersonPhone}
                 onChange={handleChange('malaysiaResidenceDetails', 'MalaysiaContactPersonPhone')}
+                error={!!errors.MalaysiaContactPersonPhone}
+                helperText={errors.MalaysiaContactPersonPhone}
               />
             </Grid>
           </Grid>
@@ -687,7 +751,10 @@ export default function AddMemberDetails({ member, onBack, onSubmit }: AddMember
                 label="Malaysia Emergency Contact Person"
                 value={formData.emergencyDetails.MalaysiaEmergencyContactPerson}
                 onChange={handleChange('emergencyDetails', 'MalaysiaEmergencyContactPerson')}
+                error={!!errors.MalaysiaEmergencyContactPerson}
+                helperText={errors.MalaysiaEmergencyContactPerson}
               />
+              
             </Grid>
             <Grid item xs={12} md={6}>
               <TextField
@@ -695,6 +762,8 @@ export default function AddMemberDetails({ member, onBack, onSubmit }: AddMember
                 label="Malaysia Emergency Phone"
                 value={formData.emergencyDetails.MalaysiaEmergencyPhone}
                 onChange={handleChange('emergencyDetails', 'MalaysiaEmergencyPhone')}
+                error={!!errors.MalaysiaEmergencyPhone}
+                helperText={errors.MalaysiaEmergencyPhone}
               />
             </Grid>
             <Grid item xs={12} md={6}>
@@ -703,6 +772,8 @@ export default function AddMemberDetails({ member, onBack, onSubmit }: AddMember
                 label="Other Emergency Contact Person"
                 value={formData.emergencyDetails.OtherEmergencyContactPerson}
                 onChange={handleChange('emergencyDetails', 'OtherEmergencyContactPerson')}
+                error={!!errors.OtherEmergencyContactPerson}
+                helperText={errors.OtherEmergencyContactPerson}
               />
             </Grid>
             <Grid item xs={12} md={6}>
@@ -711,6 +782,8 @@ export default function AddMemberDetails({ member, onBack, onSubmit }: AddMember
                 label="Other Emergency Phone"
                 value={formData.emergencyDetails.OtherEmergencyPhone}
                 onChange={handleChange('emergencyDetails', 'OtherEmergencyPhone')}
+                error={!!errors.OtherEmergencyPhone}
+                helperText={errors.OtherEmergencyPhone}
               />
             </Grid>
           </Grid>
@@ -724,6 +797,8 @@ export default function AddMemberDetails({ member, onBack, onSubmit }: AddMember
                 label="Employer Full Name"
                 value={formData.employerDetails.EmployerFullName}
                 onChange={handleChange('employerDetails', 'EmployerFullName')}
+                error={!!errors.EmployerFullName}
+                helperText={errors.EmployerFullName}
               />
             </Grid>
             <Grid item xs={12} md={6}>
@@ -732,6 +807,8 @@ export default function AddMemberDetails({ member, onBack, onSubmit }: AddMember
                 label="Company Name"
                 value={formData.employerDetails.CompanyName}
                 onChange={handleChange('employerDetails', 'CompanyName')}
+                error={!!errors.CompanyName}
+                helperText={errors.CompanyName}
               />
             </Grid>
             <Grid item xs={12} md={6}>
@@ -740,6 +817,8 @@ export default function AddMemberDetails({ member, onBack, onSubmit }: AddMember
                 label="Mobile Number"
                 value={formData.employerDetails.MobileNumber}
                 onChange={handleChange('employerDetails', 'MobileNumber')}
+                error={!!errors.MobileNumber}
+                helperText={errors.MobileNumber}
               />
             </Grid>
             <Grid item xs={12} md={6}>
@@ -748,6 +827,8 @@ export default function AddMemberDetails({ member, onBack, onSubmit }: AddMember
                 label="ID Number"
                 value={formData.employerDetails.IDNumber}
                 onChange={handleChange('employerDetails', 'IDNumber')}
+                error={!!errors.IDNumber}
+                helperText={errors.IDNumber}
               />
             </Grid>
             <Grid item xs={12}>
@@ -756,6 +837,8 @@ export default function AddMemberDetails({ member, onBack, onSubmit }: AddMember
                 label="Employer Address"
                 value={formData.employerDetails.EmployerAddress}
                 onChange={handleChange('employerDetails', 'EmployerAddress')}
+                error={!!errors.EmployerAddress}
+                helperText={errors.EmployerAddress}
               />
             </Grid>
             <Grid item xs={12} md={6}>
@@ -764,6 +847,8 @@ export default function AddMemberDetails({ member, onBack, onSubmit }: AddMember
                 label="City"
                 value={formData.employerDetails.City}
                 onChange={handleChange('employerDetails', 'City')}
+                error={!!errors.City}
+                helperText={errors.City}
               />
             </Grid>
             <Grid item xs={12} md={6}>
@@ -772,6 +857,8 @@ export default function AddMemberDetails({ member, onBack, onSubmit }: AddMember
                 label="State"
                 value={formData.employerDetails.State}
                 onChange={handleChange('employerDetails', 'State')}
+                error={!!errors.State}
+                helperText={errors.State}
               />
             </Grid>
             <Grid item xs={12} md={6}>
@@ -780,6 +867,8 @@ export default function AddMemberDetails({ member, onBack, onSubmit }: AddMember
                 label="Employer Country"
                 value={formData.employerDetails.EmployerCountry}
                 onChange={handleChange('employerDetails', 'EmployerCountry')}
+                error={!!errors.EmployerCountry}
+                helperText={errors.EmployerCountry}
               />
             </Grid>
             <Grid item xs={12} md={6}>
@@ -788,6 +877,8 @@ export default function AddMemberDetails({ member, onBack, onSubmit }: AddMember
                 label="Pin Code"
                 value={formData.employerDetails.PinCode}
                 onChange={handleChange('employerDetails', 'PinCode')}
+                error={!!errors.PinCode}
+                helperText={errors.PinCode}
               />
             </Grid>
           </Grid>
@@ -802,6 +893,8 @@ export default function AddMemberDetails({ member, onBack, onSubmit }: AddMember
                   label="Passport Number"
                   value={formData.passportDetails.PassportNumber}
                   onChange={handleChange('passportDetails', 'PassportNumber')}
+                  error={!!errors.PassportNumber}
+                  helperText={errors.PassportNumber}
                 />
               </Grid>
               <Grid item xs={12} md={6}>
@@ -810,6 +903,8 @@ export default function AddMemberDetails({ member, onBack, onSubmit }: AddMember
                   label="Surname"
                   value={formData.passportDetails.Surname}
                   onChange={handleChange('passportDetails', 'Surname')}
+                  error={!!errors.Surname}
+                  helperText={errors.Surname}
                 />
               </Grid>
               <Grid item xs={12} md={6}>
@@ -818,6 +913,8 @@ export default function AddMemberDetails({ member, onBack, onSubmit }: AddMember
                   label="Given Names"
                   value={formData.passportDetails.GivenNames}
                   onChange={handleChange('passportDetails', 'GivenNames')}
+                  error={!!errors.GivenNames}
+                  helperText={errors.GivenNames}
                 />
               </Grid>
               <Grid item xs={12} md={6}>
@@ -826,6 +923,8 @@ export default function AddMemberDetails({ member, onBack, onSubmit }: AddMember
                   label="Nationality"
                   value={formData.passportDetails.Nationality}
                   onChange={handleChange('passportDetails', 'Nationality')}
+                  error={!!errors.Nationality}
+                  helperText={errors.Nationality}
                 />
               </Grid>
               <Grid item xs={12} md={6}>
@@ -836,6 +935,8 @@ export default function AddMemberDetails({ member, onBack, onSubmit }: AddMember
                   value={formData.passportDetails.DateOfIssue}
                   onChange={handleChange('passportDetails', 'DateOfIssue')}
                   InputLabelProps={{ shrink: true }}
+                  error={!!errors.DateOfIssue}
+                  helperText={errors.DateOfIssue}
                 />
               </Grid>
               <Grid item xs={12} md={6}>
@@ -846,6 +947,8 @@ export default function AddMemberDetails({ member, onBack, onSubmit }: AddMember
                   value={formData.passportDetails.DateOfExpiry}
                   onChange={handleChange('passportDetails', 'DateOfExpiry')}
                   InputLabelProps={{ shrink: true }}
+                  error={!!errors.DateOfExpiry}
+                  helperText={errors.DateOfExpiry}
                 />
               </Grid>
               <Grid item xs={12} md={6}>
@@ -854,6 +957,8 @@ export default function AddMemberDetails({ member, onBack, onSubmit }: AddMember
                   label="Place of Issue"
                   value={formData.passportDetails.PlaceOfIssue}
                   onChange={handleChange('passportDetails', 'PlaceOfIssue')}
+                  error={!!errors.PlaceOfIssue}
+                  helperText={errors.PlaceOfIssue}
                 />
               </Grid>
             </Grid>

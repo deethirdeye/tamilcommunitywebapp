@@ -129,26 +129,83 @@ const validateUpdatePasswordFields = () => {
     }
     if (!newUser.phoneNo) {
       errors.phoneNo = 'Phone number is required';
-    } else if (!/^\d+$/.test(newUser.phoneNo)) {
+  } else if (!/^\d+$/.test(newUser.phoneNo)) {
       errors.phoneNo = 'Phone number must contain only numbers';
+  } else {
+      // Remove any whitespace and common phone number characters for length check
+      const cleanPhone = newUser.phoneNo.replace(/[\s-()]/g, '');
+      
+      // Check minimum length (typically 10 digits for US numbers)
+      if (cleanPhone.length < 8) {
+          errors.phoneNo = 'Phone number must be at least 8 digits';
+      }
+      
+      // Check maximum length (typically 15 digits including country code)
+      if (cleanPhone.length > 15) {
+          errors.phoneNo = 'Phone number cannot exceed 15 digits';
+      }
+      
+      // Optional: Add specific format validation
+      // This regex accepts formats like: 1234567890, (123)4567890, 123-456-7890, +11234567890
+      const phoneRegex = /^(?:\+?\d{1,3})?[-.\s]?(?:\(\d{3}\)|\d{3})[-.\s]?\d{3}[-.\s]?\d{4}$/;
+      if (!phoneRegex.test(newUser.phoneNo)) {
+          errors.phoneNo = 'Please enter a valid phone number format';
+      }
+  }
+  if (!newUser.password) {
+    errors.password = 'Password is required';
+} else {
+    // Minimum length check (8 characters)
+    if (newUser.password.length < 6) {
+        errors.password = 'Password must be at least 6 characters long';
     }
-    if (!newUser .password) {
-      errors.password = 'Password is required';
+    
+    // Maximum length check (optional, 64 characters)
+    if (newUser.password.length > 64) {
+        errors.password = 'Password cannot exceed 64 characters';
     }
-    if (!newUser .role) {
-      errors.role = 'Role is required';
+    
+    // Complexity requirements
+    const hasUpperCase = /[A-Z]/.test(newUser.password);
+    const hasLowerCase = /[a-z]/.test(newUser.password);
+    const hasNumbers = /\d/.test(newUser.password);
+    const hasSpecialChar = /[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]/.test(newUser.password);
+    
+    if (!(hasUpperCase && hasLowerCase && hasNumbers && hasSpecialChar)) {
+        errors.password = 'Password must contain at least one uppercase letter, one lowercase letter, one number, and one special character';
     }
-    if (!newUser .status) {
-      errors.status = 'Status is required';
+    
+    // Check for whitespace
+    if (/\s/.test(newUser.password)) {
+        errors.password = 'Password cannot contain spaces';
     }
-    setValidationErrors(errors);
-    return Object.keys(errors).length === 0; // Return true if there are no errors
-  };
+    
+    // Optional: Check for common weak passwords
+    const weakPasswords = ['password', '12345678', 'qwerty123', 'admin123'];
+    if (weakPasswords.includes(newUser.password.toLowerCase())) {
+        errors.password = 'This password is too common and not secure';
+    }
+}
+if (!newUser.role) {
+  errors.role = 'Role is required';
+}
+if (!newUser.status) {
+  errors.status = 'Status is required';
+}
+setValidationErrors(errors);
+return Object.keys(errors).length === 0;
+};
   
  
   const filteredRows = rows.filter(row =>
     (row.name?.toLowerCase() || '').includes(searchTerm.toLowerCase()) ||
     (row.emailId?.toLowerCase() || '').includes(searchTerm.toLowerCase())
+    ||
+    (row.userId.toLowerCase() || '').includes(searchTerm.toLowerCase())  ||
+    (row.role.toLowerCase() || '').includes(searchTerm.toLowerCase()) ||
+    (row.phoneNo.toLowerCase() || '').includes(searchTerm.toLowerCase())
+    ||
+    (row.status.toLowerCase() || '').includes(searchTerm.toLowerCase())
   );
   const handleEditClick = (user: User) => {
     setEditingUser(user);

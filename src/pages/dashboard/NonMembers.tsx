@@ -51,10 +51,10 @@ interface NonMember {
 }
 
 const columns: GridColDef[] = [
-  { field: 'userCode', headerName: 'Non Member UserCode', flex: 1, resizable: false },
+  { field: 'userCode', headerName: 'Non Member User Code', flex: 1, resizable: false },
   { field: 'name', headerName: 'Name', flex: 1, resizable: false },
   { field: 'email', headerName: 'Email', flex: 1, resizable: false },
-  { field: 'mobileNumber', headerName: 'MobileNumber', flex: 1, resizable: false },
+  { field: 'mobileNumber', headerName: 'Mobile Number', flex: 1, resizable: false },
   { field: 'addedByMemberCode', headerName: 'Added by Member Code', flex: 1, resizable: false },
 ];
 
@@ -100,7 +100,11 @@ const NonMembers: React.FC<NonMembersProps> = ({ userCode, onBack }) => {
     row.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
     row.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
     row.userCode.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    row.addedByMemberCode.toLowerCase().includes(searchTerm.toLowerCase())
+    row.addedByMemberCode.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    row.mobileNumber.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    
+    row.emergencyContactPersonName.toLowerCase().includes(searchTerm.toLowerCase())|
+    row.emergencyContactPersonMobile.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
   const handleRowClick = (params: GridRowParams) => {

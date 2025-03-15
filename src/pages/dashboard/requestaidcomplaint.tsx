@@ -19,7 +19,7 @@ interface AidRequest {
   requestId: string;
   fullName: string;
   aidType: string;
-  createdOn: string;
+  createdOn: Date; 
   processStatus: string;
   description: string;
   userId: string;
@@ -168,11 +168,7 @@ export default function RequestAidComplaint({ onRowClick }: RequestAidComplaintP
             requestId: item.RequestID,
             fullName: item.FullName,
             aidType: item.AidType,
-            createdOn:  new Date(item.CreatedOn).toLocaleDateString('en-US', {
-              year: 'numeric',
-              month: 'short',
-              day: 'numeric'
-            }),
+            createdOn: new Date(item.CreatedOn), 
             processStatus: item.ProcessStatus,
             description: item.Description,
             userId: item.UserId
@@ -203,7 +199,7 @@ export default function RequestAidComplaint({ onRowClick }: RequestAidComplaintP
   const filteredRows = Array.isArray(rows) 
     ? rows.filter(row =>
         row.fullName.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        row.requestId.includes(searchTerm) ||
+        row.requestId.toLowerCase().includes(searchTerm.toLowerCase()) ||
         row.aidType.toLowerCase().includes(searchTerm.toLowerCase()) ||
         row.processStatus.toLowerCase().includes(searchTerm.toLowerCase())
         
@@ -216,7 +212,11 @@ export default function RequestAidComplaint({ onRowClick }: RequestAidComplaintP
   const CustomGridToolbarExport = () => {
     return (
       <GridToolbarExport
-      printOptions={{ disableToolbarButton: true }} // Disable the print option here
+      printOptions={{ disableToolbarButton: true }}
+      csvOptions={{
+        fileName: 'Grievance',
+        utf8WithBom: true, // Ensure UTF-8 encoding with BOM
+      }} // Disable the print option here
     />
     );
   };
@@ -258,20 +258,25 @@ export default function RequestAidComplaint({ onRowClick }: RequestAidComplaintP
         slots={{
           toolbar: GridToolbarContainer,
         }}
-        slotProps={{
-          toolbar: {
-            sx: { justifyContent: 'flex-end' },
-            children: (
-              <>
-                <GridToolbarFilterButton />
-                <GridToolbarDensitySelector />
-                <GridToolbarExport 
-                 printOptions={null} // This disables the print option
-                 csvOptions={{ allColumns: true }} />
-              </>
-            ),
-          },
-        }}
+         slotProps={{
+                      toolbar: {
+                        sx: { justifyContent: 'flex-end' },
+                        
+                        children: (
+                          <>
+                            <GridToolbarFilterButton />
+                            <GridToolbarDensitySelector />
+                            <GridToolbarExport
+                    printOptions={{ disableToolbarButton: true }} 
+                    csvOptions={{
+                      fileName: 'Grievance',
+                      utf8WithBom: true, // Ensure UTF-8 encoding with BOM
+                    }}// Disable the print option here
+                  />
+                          </>
+                        ),
+                      },
+                    }}
         sx={{
           border: 0,
           flexGrow: 1,

@@ -3,6 +3,7 @@ import { Box, Typography, Button, Grid, TextField, Tabs, Tab, Alert, Snackbar } 
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import { LocalizationProvider, DatePicker } from '@mui/x-date-pickers';
 import AppConfig from '../../AppConfig';
+import dayjs from 'dayjs';
 
 interface Member {
   id: number;
@@ -59,7 +60,7 @@ interface FormData {
   employerDetails: {
     EmployerFullName: string;
     CompanyName: string;
-    MobileNumber: string;
+    MobileNumberemp: string;
     IDNumber: string;
     EmployerAddress: string;
     City: string;
@@ -128,7 +129,7 @@ export default function AddMemberDetails({ member, onBack, onSubmit }: AddMember
     employerDetails: {
       EmployerFullName: '',
       CompanyName: '',
-      MobileNumber: '',
+      MobileNumberemp: '',
       IDNumber: '',
       EmployerAddress: '',
       City: '',
@@ -156,183 +157,561 @@ export default function AddMemberDetails({ member, onBack, onSubmit }: AddMember
   const [errors, setErrors] = useState<{[key: string]: string}>({});
   const [openSnackbar, setOpenSnackbar] = useState(false);
   const [snackbarMessage, setSnackbarMessage] = useState('');
-  const validateBasicDetails = () => {
-    const basicErrors: {[key: string]: string} = {};
-    
-    if (!formData.basicDetails.FullName.trim()) {
-      basicErrors.FullName = 'Full Name is required';
-    }
-    if (!formData.basicDetails.Email.trim()) {
-      basicErrors.Email = 'Email is required';
-    } else if (!/\S+@\S+\.\S+/.test(formData.basicDetails.Email)) {
-      basicErrors.Email = 'Invalid email format';
-    }
-    if (!formData.basicDetails.MobileNumber.trim()) {
-      basicErrors.MobileNumber = 'Mobile Number is required11';
-    } 
-    if (!formData.basicDetails.DOB) {
-      basicErrors.DOB = 'Date of Birth is required';
-    }
-    if (!formData.basicDetails.CurrentLocation.trim()) {
-      basicErrors.CurrentLocation = 'Current Location is required';
-    }
+  // const validateBasicDetails = () => {
+  //   const basicErrors: { [key: string]: string } = {};
+  
+  //   // Full Name: 2-50 characters
+  //   const fullName = formData.basicDetails.FullName.trim();
+  //   if (!fullName) {
+  //     basicErrors.FullName = 'Full Name is required';
+  //   } else if (fullName.length < 3 || fullName.length > 50) {
+  //     basicErrors.FullName = 'Full Name must be between 3 and 50 characters';
+  //   }
+  
+  //   // Email: Valid format, 5-100 characters
+  //   const email = formData.basicDetails.Email.trim();
+  //   if (!email) {
+  //     basicErrors.Email = 'Email is required';
+  //   } else if (!/\S+@\S+\.\S+/.test(email)) {
+  //     basicErrors.Email = 'Invalid email format';
+  //   } else if (email.length < 5 || email.length > 100) {
+  //     basicErrors.Email = 'Email must be between 5 and 100 characters';
+  //   }
+  
+  //   // Mobile Number: 8-15 digits
+  //   const mobileNumber = formData.basicDetails.MobileNumber.trim();
+  //   if (!mobileNumber) {
+  //     basicErrors.MobileNumberbasic = 'Mobile Number is required';
+  //   } else if (!/^\d{9,15}$/.test(mobileNumber)) {
+  //     basicErrors.MobileNumberbasic = 'Mobile Number must be 9-15 digits';
+  //   }
+  
+  //   // Date of Birth: Not in future, not before 1900
+  //   const dob = formData.basicDetails.DOB;
+  //   if (!dob) {
+  //     basicErrors.dob = 'DOB  is required';
+  //   } 
+  //   const dobObj = dob ? new Date(dob) : new Date('');
+  //   const currentDate = new Date();
+  //   const minDate = new Date('1900-01-01');
+  //   if (!dob) {
+  //     basicErrors.DOB = 'Date of Birth is required';
+  //   } else if (isNaN(dobObj.getTime())) {
+  //     basicErrors.DOB = 'Invalid Date of Birth';
+  //   } else if (dobObj > currentDate) {
+  //     basicErrors.DOB = 'Date of Birth cannot be in the future';
+  //   } else if (dobObj < minDate) {
+  //     basicErrors.DOB = 'Date of Birth cannot be before 1900';
+  //   }
+  
+  //   // Current Location: 2-100 characters
+  //   const currentLocation = formData.basicDetails.CurrentLocation.trim();
+  //   if (!currentLocation) {
+  //     basicErrors.CurrentLocation = 'Current Location is required';
+  //   } else if (currentLocation.length < 2 || currentLocation.length > 100) {
+  //     basicErrors.CurrentLocation = 'Current Location must be between 2 and 100 characters';
+  //   }
+  
+  //   return basicErrors;
+  // };
 
+  const validateBasicDetails = () => {
+    const basicErrors: { [key: string]: string } = {};
+  
+    // Full Name: 2-50 characters
+    const fullName = formData.basicDetails.FullName.trim();
+    if (!fullName) {
+      basicErrors.FullName = 'Full Name is required';
+    } else if (fullName.length < 3 || fullName.length > 50) {
+      basicErrors.FullName = 'Full Name must be between 3 and 50 characters';
+    }
+  
+    // Email: Valid format, 5-100 characters
+    const email = formData.basicDetails.Email.trim();
+    if (!email) {
+      basicErrors.Email = 'Email is required';
+    } else if (!/\S+@\S+\.\S+/.test(email)) {
+      basicErrors.Email = 'Invalid email format';
+    } else if (email.length < 5 || email.length > 100) {
+      basicErrors.Email = 'Email must be between 5 and 100 characters';
+    }
+  
+    // Mobile Number: 8-15 digits
+    const mobileNumber = formData.basicDetails.MobileNumber.trim();
+    if (!mobileNumber) {
+      basicErrors.MobileNumber = 'Mobile Number is required';
+    } else if (!/^\d{8,15}$/.test(mobileNumber)) {
+      basicErrors.MobileNumber = 'Mobile Number must be 8-15 digits';
+    }
+  
+    // Date of Birth: Not in future, not before 1900
+    const dob = formData.basicDetails.DOB;
+    if (!dob) {
+      basicErrors.DOB = 'Date of Birth is required';
+    } else {
+      const dobObj = new Date(dob);
+      const currentDate = new Date();
+      const minDate = new Date('1900-01-01');
+  
+      if (isNaN(dobObj.getTime())) {
+        basicErrors.DOB = 'Invalid Date of Birth';
+      } else if (dobObj > currentDate) {
+        basicErrors.DOB = 'Date of Birth cannot be in the future';
+      } else if (dobObj < minDate) {
+        basicErrors.DOB = 'Date of Birth cannot be before 1900';
+      }
+    }
+  
+    // Current Location: 2-100 characters
+    const currentLocation = formData.basicDetails.CurrentLocation.trim();
+    if (!currentLocation) {
+      basicErrors.CurrentLocation = 'Current Location is required';
+    } else if (currentLocation.length < 2 || currentLocation.length > 100) {
+      basicErrors.CurrentLocation = 'Current Location must be between 2 and 100 characters';
+    }
+  
     return basicErrors;
   };
 
   const validateNativeDetails = () => {
-    const nativeErrors: {[key: string]: string} = {};
-    
-    if (!formData.nativeDetails.NativeAddress.trim()) {
+    const nativeErrors: { [key: string]: string } = {};
+  
+    // Native Address: 5-200 characters
+    const nativeAddress = formData.nativeDetails.NativeAddress.trim();
+    if (!nativeAddress) {
       nativeErrors.NativeAddress = 'Native Address is required';
+    } else if (nativeAddress.length < 5 || nativeAddress.length > 200) {
+      nativeErrors.NativeAddress = 'Native Address must be between 5 and 200 characters';
     }
-    if (!formData.nativeDetails.NativeCity.trim()) {
+  
+    // Native City: 2-50 characters
+    const nativeCity = formData.nativeDetails.NativeCity.trim();
+    if (!nativeCity) {
       nativeErrors.NativeCity = 'Native City is required';
+    } else if (nativeCity.length < 2 || nativeCity.length > 50) {
+      nativeErrors.NativeCity = 'Native City must be between 2 and 50 characters';
     }
-    if (!formData.nativeDetails.NativeState.trim()) {
+  
+    // Native State: 2-50 characters
+    const nativeState = formData.nativeDetails.NativeState.trim();
+    if (!nativeState) {
       nativeErrors.NativeState = 'Native State is required';
+    } else if (nativeState.length < 2 || nativeState.length > 50) {
+      nativeErrors.NativeState = 'Native State must be between 2 and 50 characters';
     }
-    if (!formData.nativeDetails.NativePinCode.trim()) {
+  
+    // Native Pin Code: 4-10 digits (generic, as country isn’t specified)
+    const nativePinCode = formData.nativeDetails.NativePinCode.trim();
+    if (!nativePinCode) {
       nativeErrors.NativePinCode = 'Native Pin Code is required';
+    } else if (!/^\d{4,10}$/.test(nativePinCode)) {
+      nativeErrors.NativePinCode = 'Native Pin Code must be 4-10 digits';
     }
-    if (!formData.nativeDetails.NativeContactPersonName.trim()) {
+  
+    // Native Contact Person Name: 2-50 characters
+    const nativeContactName = formData.nativeDetails.NativeContactPersonName.trim();
+    if (!nativeContactName) {
       nativeErrors.NativeContactPersonName = 'Contact Person Name is required';
+    } else if (nativeContactName.length < 2 || nativeContactName.length > 50) {
+      nativeErrors.NativeContactPersonName = 'Contact Person Name must be between 2 and 50 characters';
     }
-    if (!formData.nativeDetails.NativeContactPersonPhone.trim()) {
+  
+    // Native Contact Person Phone: 8-15 digits
+    const nativeContactPhone = formData.nativeDetails.NativeContactPersonPhone.trim();
+    if (!nativeContactPhone) {
       nativeErrors.NativeContactPersonPhone = 'Contact Person Phone is required';
+    } else if (!/^\d{8,15}$/.test(nativeContactPhone)) {
+      nativeErrors.NativeContactPersonPhone = 'Contact Person Phone must be 8-15 digits';
     }
-
+  
     return nativeErrors;
   };
 
   const validateMalaysiaWorkDetails = () => {
-    const workErrors: {[key: string]: string} = {};
-    
-    if (!formData.malaysiaWorkDetails.MalaysiaWorkAddress.trim()) {
+    const workErrors: { [key: string]: string } = {};
+  
+    // Malaysia Work Address: 5-200 characters
+    const workAddress = formData.malaysiaWorkDetails.MalaysiaWorkAddress.trim();
+    if (!workAddress) {
       workErrors.MalaysiaWorkAddress = 'Work Address is required';
+    } else if (workAddress.length < 5 || workAddress.length > 200) {
+      workErrors.MalaysiaWorkAddress = 'Work Address must be between 5 and 200 characters';
     }
-    if (!formData.malaysiaWorkDetails.MalaysiaCity.trim()) {
+  
+    // Malaysia City: 2-50 characters
+    const malaysiaCity = formData.malaysiaWorkDetails.MalaysiaCity.trim();
+    if (!malaysiaCity) {
       workErrors.MalaysiaCity = 'City is required';
+    } else if (malaysiaCity.length < 2 || malaysiaCity.length > 50) {
+      workErrors.MalaysiaCity = 'City must be between 2 and 50 characters';
     }
-    if (!formData.malaysiaWorkDetails.MalaysiaState.trim()) {
+  
+    // Malaysia State: 2-50 characters
+    const malaysiaState = formData.malaysiaWorkDetails.MalaysiaState.trim();
+    if (!malaysiaState) {
       workErrors.MalaysiaState = 'State is required';
+    } else if (malaysiaState.length < 2 || malaysiaState.length > 50) {
+      workErrors.MalaysiaState = 'State must be between 2 and 50 characters';
     }
-    if (!formData.malaysiaWorkDetails.MalaysiaPinCode.trim()) {
+  
+    // Malaysia Pin Code: 5 digits (Malaysia-specific)
+    const malaysiaPinCode = formData.malaysiaWorkDetails.MalaysiaPinCode.trim();
+    if (!malaysiaPinCode) {
       workErrors.MalaysiaPinCode = 'Pin Code is required';
+    } else if (!/^\d{4,10}$/.test(malaysiaPinCode)) {
+      workErrors.MalaysiaPinCode  = 'Malaysia Pin Code must be 4-10 digits';
     }
-    if (!formData.malaysiaWorkDetails.MalaysiaWorkContactPersonName.trim()) {
+  
+    // Malaysia Work Contact Person Name: 2-50 characters
+    const workContactName = formData.malaysiaWorkDetails.MalaysiaWorkContactPersonName.trim();
+    if (!workContactName) {
       workErrors.MalaysiaWorkContactPersonName = 'Contact Person Name is required';
+    } else if (workContactName.length < 2 || workContactName.length > 50) {
+      workErrors.MalaysiaWorkContactPersonName = 'Contact Person Name must be between 2 and 50 characters';
     }
-    if (!formData.malaysiaWorkDetails.MalaysiaWorkContactPersonPhone.trim()) {
+  
+    // Malaysia Work Contact Person Phone: 8-15 digits
+    const workContactPhone = formData.malaysiaWorkDetails.MalaysiaWorkContactPersonPhone.trim();
+    if (!workContactPhone) {
       workErrors.MalaysiaWorkContactPersonPhone = 'Contact Person Phone is required';
+    } else if (!/^\d{8,15}$/.test(workContactPhone)) {
+      workErrors.MalaysiaWorkContactPersonPhone = 'Contact Person Phone must be 8-15 digits';
     }
-
+  
     return workErrors;
   };
 
   const validateMalaysiaResidenceDetails = () => {
-    const residenceErrors: {[key: string]: string} = {};
-    
-    if (!formData.malaysiaResidenceDetails.MalaysiaAddress.trim()) {
+    const residenceErrors: { [key: string]: string } = {};
+  
+    // Malaysia Address: 5-200 characters
+    const malaysiaAddress = formData.malaysiaResidenceDetails.MalaysiaAddress.trim();
+    if (!malaysiaAddress) {
       residenceErrors.MalaysiaAddress = 'Malaysia Address is required';
+    } else if (malaysiaAddress.length < 5 || malaysiaAddress.length > 200) {
+      residenceErrors.MalaysiaAddress = 'Malaysia Address must be between 5 and 200 characters';
     }
-    if (!formData.malaysiaResidenceDetails.MalaysiaResidenceCity.trim()) {
+  
+    // Malaysia Residence City: 2-50 characters
+    const malaysiaCity = formData.malaysiaResidenceDetails.MalaysiaResidenceCity.trim();
+    if (!malaysiaCity) {
       residenceErrors.MalaysiaResidenceCity = 'Residence City is required';
+    } else if (malaysiaCity.length < 2 || malaysiaCity.length > 50) {
+      residenceErrors.MalaysiaResidenceCity = 'Residence City must be between 2 and 50 characters';
     }
-    if (!formData.malaysiaResidenceDetails.MalaysiaResidenceState.trim()) {
+  
+    // Malaysia Residence State: 2-50 characters
+    const malaysiaState = formData.malaysiaResidenceDetails.MalaysiaResidenceState.trim();
+    if (!malaysiaState) {
       residenceErrors.MalaysiaResidenceState = 'Residence State is required';
+    } else if (malaysiaState.length < 2 || malaysiaState.length > 50) {
+      residenceErrors.MalaysiaResidenceState = 'Residence State must be between 2 and 50 characters';
     }
-    if (!formData.malaysiaResidenceDetails.MalaysiaResidencePinCode.trim()) {
+  
+    // Malaysia Residence Pin Code: 5 digits (Malaysia-specific)
+    const malaysiaPinCode = formData.malaysiaResidenceDetails.MalaysiaResidencePinCode.trim();
+    if (!malaysiaPinCode) {
       residenceErrors.MalaysiaResidencePinCode = 'Residence Pin Code is required';
+    } else if (!/^\d{4,10}$/.test(malaysiaPinCode)) {
+      residenceErrors.MalaysiaResidencePinCode = 'Residence Pin Code must be 4-10 digits';
     }
-    if (!formData.malaysiaResidenceDetails.MalaysiaContactPersonName.trim()) {
+  
+    // Malaysia Contact Person Name: 2-50 characters
+    const malaysiaContactName = formData.malaysiaResidenceDetails.MalaysiaContactPersonName.trim();
+    if (!malaysiaContactName) {
       residenceErrors.MalaysiaContactPersonName = 'Contact Person Name is required';
+    } else if (malaysiaContactName.length < 2 || malaysiaContactName.length > 50) {
+      residenceErrors.MalaysiaContactPersonName = 'Contact Person Name must be between 2 and 50 characters';
     }
-    if (!formData.malaysiaResidenceDetails.MalaysiaContactPersonPhone.trim()) {
+  
+    // Malaysia Contact Person Phone: 8-15 digits
+    const malaysiaContactPhone = formData.malaysiaResidenceDetails.MalaysiaContactPersonPhone.trim();
+    if (!malaysiaContactPhone) {
       residenceErrors.MalaysiaContactPersonPhone = 'Contact Person Phone is required';
+    } else if (!/^\d{8,15}$/.test(malaysiaContactPhone)) {
+      residenceErrors.MalaysiaContactPersonPhone = 'Contact Person Phone must be 8-15 digits';
     }
-
+  
     return residenceErrors;
   };
 
   const validateEmergencyDetails = () => {
-    const emergencyErrors: {[key: string]: string} = {};
-    
-    if (!formData.emergencyDetails.MalaysiaEmergencyContactPerson.trim()) {
+    const emergencyErrors: { [key: string]: string } = {};
+  
+    // Malaysia Emergency Contact Person: 2-50 characters
+    const malaysiaContactPerson = formData.emergencyDetails.MalaysiaEmergencyContactPerson.trim();
+    if (!malaysiaContactPerson) {
       emergencyErrors.MalaysiaEmergencyContactPerson = 'Malaysia Emergency Contact Person is required';
+    } else if (malaysiaContactPerson.length < 2 || malaysiaContactPerson.length > 50) {
+      emergencyErrors.MalaysiaEmergencyContactPerson = 'Malaysia Emergency Contact Person must be between 2 and 50 characters';
     }
-    if (!formData.emergencyDetails.MalaysiaEmergencyPhone.trim()) {
+  
+    // Malaysia Emergency Phone: 8-15 digits
+    const malaysiaPhone = formData.emergencyDetails.MalaysiaEmergencyPhone.trim();
+    if (!malaysiaPhone) {
       emergencyErrors.MalaysiaEmergencyPhone = 'Malaysia Emergency Phone is required';
+    } else if (!/^\d{8,15}$/.test(malaysiaPhone)) {
+      emergencyErrors.MalaysiaEmergencyPhone = 'Malaysia Emergency Phone must be 8-15 digits';
     }
-    if (!formData.emergencyDetails.OtherEmergencyContactPerson.trim()) {
+  
+    // Other Emergency Contact Person: 2-50 characters
+    const otherContactPerson = formData.emergencyDetails.OtherEmergencyContactPerson.trim();
+    if (!otherContactPerson) {
       emergencyErrors.OtherEmergencyContactPerson = 'Other Emergency Contact Person is required';
+    } else if (otherContactPerson.length < 2 || otherContactPerson.length > 50) {
+      emergencyErrors.OtherEmergencyContactPerson = 'Other Emergency Contact Person must be between 2 and 50 characters';
     }
-    if (!formData.emergencyDetails.OtherEmergencyPhone.trim()) {
+  
+    // Other Emergency Phone: 8-15 digits
+    const otherPhone = formData.emergencyDetails.OtherEmergencyPhone.trim();
+    if (!otherPhone) {
       emergencyErrors.OtherEmergencyPhone = 'Other Emergency Phone is required';
+    } else if (!/^\d{8,15}$/.test(otherPhone)) {
+      emergencyErrors.OtherEmergencyPhone = 'Other Emergency Phone must be 8-15 digits';
     }
-
+  
     return emergencyErrors;
   };
 
   const validateEmployerDetails = () => {
-    const employerErrors: {[key: string]: string} = {};
-    
-    if (!formData.employerDetails.EmployerFullName.trim()) {
+    const employerErrors: { [key: string]: string } = {};
+  
+    // Employer Full Name: 2-50 characters
+    const employerFullName = formData.employerDetails.EmployerFullName.trim();
+    if (!employerFullName) {
       employerErrors.EmployerFullName = 'Employer Full Name is required';
+    } else if (employerFullName.length < 2 || employerFullName.length > 50) {
+      employerErrors.EmployerFullName = 'Employer Full Name must be between 2 and 50 characters';
     }
-    if (!formData.employerDetails.CompanyName.trim()) {
+  
+    // Company Name: 2-100 characters
+    const companyName = formData.employerDetails.CompanyName.trim();
+    if (!companyName) {
       employerErrors.CompanyName = 'Company Name is required';
+    } else if (companyName.length < 2 || companyName.length > 100) {
+      employerErrors.CompanyName = 'Company Name must be between 2 and 100 characters';
     }
-    if (!formData.employerDetails.MobileNumber.trim()) {
-      employerErrors.MobileNumber = 'Mobile Number is required';
+  
+    // Mobile Number: 8-15 digits (international format)
+    const mobileNumber1 = formData.employerDetails.MobileNumberemp.trim();
+    if (!mobileNumber1) {
+      employerErrors.MobileNumberemp = 'Mobile Number is required';
+    } else if (!/^\d{8,15}$/.test(mobileNumber1)) {
+      employerErrors.MobileNumberemp = 'Mobile Number must be 8-15 digits';
     }
-    if (!formData.employerDetails.IDNumber.trim()) {
+  
+    // ID Number: 6-20 alphanumeric characters
+    const idNumber = formData.employerDetails.IDNumber.trim();
+    if (!idNumber) {
       employerErrors.IDNumber = 'ID Number is required';
+    } else if (!/^[a-zA-Z0-9]+$/.test(idNumber)) {
+      employerErrors.IDNumber = 'ID Number must contain only letters and numbers (no special characters)';
+    } else if (idNumber.length < 6 || idNumber.length > 20) {
+      employerErrors.IDNumber = 'ID Number must be between 6 and 20 characters';
     }
-    if (!formData.employerDetails.EmployerAddress.trim()) {
+  
+    // Employer Address: 5-200 characters
+    const employerAddress = formData.employerDetails.EmployerAddress.trim();
+    if (!employerAddress) {
       employerErrors.EmployerAddress = 'Employer Address is required';
+    } else if (employerAddress.length < 5 || employerAddress.length > 200) {
+      employerErrors.EmployerAddress = 'Employer Address must be between 5 and 200 characters';
     }
-    if (!formData.employerDetails.City.trim()) {
+  
+    // City: 2-50 characters
+    const city = formData.employerDetails.City.trim();
+    if (!city) {
       employerErrors.City = 'City is required';
+    } else if (city.length < 2 || city.length > 50) {
+      employerErrors.City = 'City must be between 2 and 50 characters';
     }
-    if (!formData.employerDetails.State.trim()) {
+  
+    // State: 2-50 characters
+    const state = formData.employerDetails.State.trim();
+    if (!state) {
       employerErrors.State = 'State is required';
+    } else if (state.length < 2 || state.length > 50) {
+      employerErrors.State = 'State must be between 2 and 50 characters';
     }
-    if (!formData.employerDetails.EmployerCountry.trim()) {
+  
+    // Employer Country: 2-50 characters
+    const employerCountry = formData.employerDetails.EmployerCountry.trim();
+    if (!employerCountry) {
       employerErrors.EmployerCountry = 'Employer Country is required';
+    } else if (employerCountry.length < 2 || employerCountry.length > 50) {
+      employerErrors.EmployerCountry = 'Employer Country must be between 2 and 50 characters';
     }
-    if (!formData.employerDetails.PinCode.trim()) {
+  
+    // Pin Code: 4-10 digits
+    const pinCode = formData.employerDetails.PinCode.trim();
+    if (!pinCode) {
       employerErrors.PinCode = 'Pin Code is required';
+    } else if (!/^\d{4,10}$/.test(pinCode)) {
+      employerErrors.PinCode = 'Pin Code must be 4-10 digits';
     }
-
+  
     return employerErrors;
   };
 
-  const validatePassportDetails = () => {
-    const passportErrors: {[key: string]: string} = {};
-    
-    if (!formData.passportDetails.PassportNumber.trim()) {
-      passportErrors.PassportNumber = 'Passport Number is required';
-    }
-    if (!formData.passportDetails.Surname.trim()) {
-      passportErrors.Surname = 'Surname is required';
-    }
-    if (!formData.passportDetails.GivenNames.trim()) {
-      passportErrors.GivenNames = 'Given Names are required';
-    }
-    if (!formData.passportDetails.Nationality.trim()) {
-      passportErrors.Nationality = 'Nationality is required';
-    }
-    if (!formData.passportDetails.DateOfIssue.trim()) {
-      passportErrors.DateOfIssue = 'Date of Issue is required';
-    }
-    if (!formData.passportDetails.DateOfExpiry.trim()) {
-      passportErrors.DateOfExpiry = 'Date of Expiry is required';
-    }
-    if (!formData.passportDetails.PlaceOfIssue.trim()) {
-      passportErrors.PlaceOfIssue = 'Place of Issue is required';
-    }
+  // const validatePassportDetails = () => {
+  //   const passportErrors: { [key: string]: string } = {};
+  
+  //   // Passport Number: Required, alphanumeric only, 6-12 characters
+  //   const passportNumber = formData.passportDetails.PassportNumber.trim();
+  //   if (!passportNumber) {
+  //     passportErrors.PassportNumber = 'Passport Number is required';
+  //   } else if (!/^[a-zA-Z0-9]+$/.test(passportNumber)) {
+  //     passportErrors.PassportNumber = 'Passport Number must contain only letters and numbers (no special characters)';
+  //   } else if (passportNumber.length < 6 || passportNumber.length > 12) {
+  //     passportErrors.PassportNumber = 'Passport Number must be between 6 and 12 characters';
+  //   }
+  
+  //   // Surname: Required, 2-50 characters
+  //   const surname = formData.passportDetails.Surname.trim();
+  //   if (!surname) {
+  //     passportErrors.Surname = 'Surname is required';
+  //   } else if (surname.length < 2 || surname.length > 50) {
+  //     passportErrors.Surname = 'Surname must be between 2 and 50 characters';
+  //   }
+  
+  //   // Given Names: Required, 2-50 characters
+  //   const givenNames = formData.passportDetails.GivenNames.trim();
+  //   if (!givenNames) {
+  //     passportErrors.GivenNames = 'Given Names are required';
+  //   } else if (givenNames.length < 2 || givenNames.length > 50) {
+  //     passportErrors.GivenNames = 'Given Names must be between 2 and 50 characters';
+  //   }
+  
+  //   // Nationality: Required, 2-50 characters
+  //   const nationality = formData.passportDetails.Nationality.trim();
+  //   if (!nationality) {
+  //     passportErrors.Nationality = 'Nationality is required';
+  //   } else if (nationality.length < 2 || nationality.length > 50) {
+  //     passportErrors.Nationality = 'Nationality must be between 2 and 50 characters';
+  //   }
+  
+  //   // Date of Issue: Required, not in future, not before 1900
+  //   const dateOfIssue = formData.passportDetails.DateOfIssue.trim();
+  //   const currentDate = new Date();
+  //   const minDate = new Date('1900-01-01');
+  //   const issueDateObj = new Date(dateOfIssue);
+  //   if (!dateOfIssue) {
+  //     passportErrors.DateOfIssue = 'Date of Issue is required';
+  //   } else if (isNaN(issueDateObj.getTime())) {
+  //     passportErrors.DateOfIssue = 'Invalid Date of Issue';
+  //   } else if (issueDateObj > currentDate) {
+  //     passportErrors.DateOfIssue = 'Date of Issue cannot be in the future';
+  //   } else if (issueDateObj < minDate) {
+  //     passportErrors.DateOfIssue = 'Date of Issue cannot be before 1900';
+  //   }
+  
+  //   // Date of Expiry: Required, after Date of Issue, not more than 20 years from today
+  //   const dateOfExpiry = formData.passportDetails.DateOfExpiry.trim();
+  //   const expiryDateObj = new Date(dateOfExpiry);
+  //   const maxExpiryDate = new Date();
+  //   maxExpiryDate.setFullYear(maxExpiryDate.getFullYear() + 20); // 20 years from today
+  //   if (!dateOfExpiry) {
+  //     passportErrors.DateOfExpiry = 'Date of Expiry is required';
+  //   } else if (isNaN(expiryDateObj.getTime())) {
+  //     passportErrors.DateOfExpiry = 'Invalid Date of Expiry';
+  //   } else if (dateOfIssue && expiryDateObj <= issueDateObj) {
+  //     passportErrors.DateOfExpiry = 'Expiry date must be later than the Date of Issue';
+  //   } else if (expiryDateObj > maxExpiryDate) {
+  //     passportErrors.DateOfExpiry = 'Expiry date cannot be more than 20 years from today';
+  //   }
+  
+  //   // Place of Issue: Required, 2-100 characters
+  //   const placeOfIssue = formData.passportDetails.PlaceOfIssue.trim();
+  //   if (!placeOfIssue) {
+  //     passportErrors.PlaceOfIssue = 'Place of Issue is required';
+  //   } else if (placeOfIssue.length < 2 || placeOfIssue.length > 100) {
+  //     passportErrors.PlaceOfIssue = 'Place of Issue must be between 2 and 500 characters';
+  //   }
+  
+  //   return passportErrors;
+  // };
 
+  const validatePassportDetails = () => {
+    const passportErrors: { [key: string]: string } = {};
+  
+    // Passport Number: Required, alphanumeric only, 6-12 characters
+    const passportNumber = formData.passportDetails.PassportNumber.trim();
+    if (!passportNumber) {
+      passportErrors.PassportNumber = 'Passport Number is required';
+    } else if (!/^[a-zA-Z0-9]+$/.test(passportNumber)) {
+      passportErrors.PassportNumber = 'Passport Number must contain only letters and numbers (no special characters)';
+    } else if (passportNumber.length < 6 || passportNumber.length > 12) {
+      passportErrors.PassportNumber = 'Passport Number must be between 6 and 12 characters';
+    }
+  
+    // Surname: Required, 2-50 characters
+    const surname = formData.passportDetails.Surname.trim();
+    if (!surname) {
+      passportErrors.Surname = 'Surname is required';
+    } else if (surname.length < 2 || surname.length > 50) {
+      passportErrors.Surname = 'Surname must be between 2 and 50 characters';
+    }
+  
+    // Given Names: Required, 2-50 characters
+    const givenNames = formData.passportDetails.GivenNames.trim();
+    if (!givenNames) {
+      passportErrors.GivenNames = 'Given Names are required';
+    } else if (givenNames.length < 2 || givenNames.length > 50) {
+      passportErrors.GivenNames = 'Given Names must be between 2 and 50 characters';
+    }
+  
+    // Nationality: Required, 2-50 characters
+    const nationality = formData.passportDetails.Nationality.trim();
+    if (!nationality) {
+      passportErrors.Nationality = 'Nationality is required';
+    } else if (nationality.length < 2 || nationality.length > 50) {
+      passportErrors.Nationality = 'Nationality must be between 2 and 50 characters';
+    }
+  
+    // Date of Issue: Required, not in future, not before 1900
+    const dateOfIssue = formData.passportDetails.DateOfIssue.trim();
+    if (!dateOfIssue) {
+      passportErrors.DateOfIssue = 'Date of Issue is required';
+    } else {
+      const issueDateObj = new Date(dateOfIssue);
+      const currentDate = new Date();
+      const minDate = new Date('1900-01-01');
+  
+      if (isNaN(issueDateObj.getTime())) {
+        passportErrors.DateOfIssue = 'Invalid Date of Issue';
+      } else if (issueDateObj > currentDate) {
+        passportErrors.DateOfIssue = 'Date of Issue cannot be in the future';
+      } else if (issueDateObj < minDate) {
+        passportErrors.DateOfIssue = 'Date of Issue cannot be before 1900';
+      }
+    }
+  
+    // Date of Expiry: Required, after Date of Issue, not more than 20 years from today
+    const dateOfExpiry = formData.passportDetails.DateOfExpiry.trim();
+    if (!dateOfExpiry) {
+      passportErrors.DateOfExpiry = 'Date of Expiry is required';
+    } else {
+      const expiryDateObj = new Date(dateOfExpiry);
+      const maxExpiryDate = new Date();
+      maxExpiryDate.setFullYear(maxExpiryDate.getFullYear() + 20); // 20 years from today
+  
+      if (isNaN(expiryDateObj.getTime())) {
+        passportErrors.DateOfExpiry = 'Invalid Date of Expiry';
+      } else if (formData.passportDetails.DateOfIssue && expiryDateObj <= new Date(formData.passportDetails.DateOfIssue)) {
+        passportErrors.DateOfExpiry = 'Expiry date must be later than the Date of Issue';
+      } else if (expiryDateObj > maxExpiryDate) {
+        passportErrors.DateOfExpiry = 'Expiry date cannot be more than 20 years from today';
+      }
+    }
+  
+    // Place of Issue: Required, 2-100 characters
+    const placeOfIssue = formData.passportDetails.PlaceOfIssue.trim();
+    if (!placeOfIssue) {
+      passportErrors.PlaceOfIssue = 'Place of Issue is required';
+    } else if (placeOfIssue.length < 2 || placeOfIssue.length > 100) {
+      passportErrors.PlaceOfIssue = 'Place of Issue must be between 2 and 100 characters';
+    }
+  
     return passportErrors;
   };
 
@@ -372,7 +751,7 @@ export default function AddMemberDetails({ member, onBack, onSubmit }: AddMember
     
     if (Object.keys(currentErrors).length > 0) {
       setErrors(currentErrors);
-      setSnackbarMessage('Please fill in all required fields');
+      setSnackbarMessage('Please fill in all required fields and check if you have entered all the date fields correctly');
       setOpenSnackbar(true);
       return;
     }
@@ -381,10 +760,9 @@ export default function AddMemberDetails({ member, onBack, onSubmit }: AddMember
     setErrors({});
     setActiveTab(newValue);
   };
-
   const handleSubmit = async (event: React.FormEvent) => {
     event.preventDefault();
-
+  
     const allErrors = {
       ...validateBasicDetails(),
       ...validateNativeDetails(),
@@ -392,16 +770,18 @@ export default function AddMemberDetails({ member, onBack, onSubmit }: AddMember
       ...validateMalaysiaResidenceDetails(),
       ...validateEmergencyDetails(),
       ...validateEmployerDetails(),
-      ...validatePassportDetails()
+      ...validatePassportDetails(),
     };
-
-    
+  
+    console.log('Validation Errors:', allErrors); // Debug log
+  
     if (Object.keys(allErrors).length > 0) {
       setErrors(allErrors);
-      setSnackbarMessage('Please fill in all required fields');
+      setSnackbarMessage('Please fill in all required fields and check if you have entered all the date fields correctly');
       setOpenSnackbar(true);
       return;
     }
+  
     try {
       const response = await fetch(`${AppConfig.API_BASE_URL}/BasicDetails/AddBasicDetailsByAdmin`, {
         method: 'POST',
@@ -410,7 +790,7 @@ export default function AddMemberDetails({ member, onBack, onSubmit }: AddMember
         },
         body: JSON.stringify(formData),
       });
-
+  
       const data = await response.json();
       if (data.ResponseCode === 1) {
         alert('Details added successfully');
@@ -423,26 +803,84 @@ export default function AddMemberDetails({ member, onBack, onSubmit }: AddMember
       alert('An error occurred while adding details');
     }
   };
+  // const handleSubmit = async (event: React.FormEvent) => {
+  //   event.preventDefault();
+
+  //   const allErrors = {
+  //     ...validateBasicDetails(),
+  //     ...validateNativeDetails(),
+  //     ...validateMalaysiaWorkDetails(),
+  //     ...validateMalaysiaResidenceDetails(),
+  //     ...validateEmergencyDetails(),
+  //     ...validateEmployerDetails(),
+  //     ...validatePassportDetails()
+  //   };
+
+    
+  //   if (Object.keys(allErrors).length > 0) {
+  //     setErrors(allErrors);
+  //     setSnackbarMessage('Please fill in all required fields and check if you have entered all the date fields correctly');
+  //     setOpenSnackbar(true);
+  //     return;
+  //   }
+  //   try {
+  //     const response = await fetch(`${AppConfig.API_BASE_URL}/BasicDetails/AddBasicDetailsByAdmin`, {
+  //       method: 'POST',
+  //       headers: {
+  //         'Content-Type': 'application/json',
+  //       },
+  //       body: JSON.stringify(formData),
+  //     });
+
+  //     const data = await response.json();
+  //     if (data.ResponseCode === 1) {
+  //       alert('Details added successfully');
+  //       onSubmit();
+  //     } else {
+  //       alert(data.Message || 'Failed to add details');
+  //     }
+  //   } catch (error) {
+  //     console.error('Error adding details:', error);
+  //     alert('An error occurred while adding details');
+  //   }
+  // };
 
   const handleChange = (section: keyof FormData, field: string) => (event: React.ChangeEvent<HTMLInputElement>) => {
     const newValue = event.target.value;
-    
+  
     // Remove the specific error for this field when it's updated
     setErrors(prev => {
-      const newErrors = {...prev};
+      const newErrors = { ...prev };
       delete newErrors[field];
       return newErrors;
     });
-
+  
     // Update form data
     setFormData(prev => ({
       ...prev,
       [section]: {
         ...prev[section],
-        [field]: newValue
-      }
+        [field]: newValue,
+      },
     }));
   };
+
+  // const handleChange = (section: keyof FormData, field: string) => (event: React.ChangeEvent<HTMLInputElement>) => {
+  //   const newValue = event.target.value;
+  
+  //   setErrors((prev) => ({
+  //     ...prev,
+  //     [field]: '', // Clear error when user starts typing
+  //   }));
+  
+  //   setFormData((prev) => ({
+  //     ...prev,
+  //     [section]: {
+  //       ...prev[section],
+  //       [field]: newValue,
+  //     },
+  //   }));
+  // };
   const handleCloseSnackbar = () => {
     setOpenSnackbar(false);
   };
@@ -512,10 +950,14 @@ export default function AddMemberDetails({ member, onBack, onSubmit }: AddMember
                 // error={!!errors.MobileNumber}
                 // helperText={errors.MobileNumber}
                 disabled
+                inputProps={{
+                  maxLength: 15,
+                  pattern: '[0-9]*', // Restrict input to digits only
+                }}
               />
             </Grid>
             <Grid item xs={12} md={6}>
-              <LocalizationProvider dateAdapter={AdapterDayjs}>
+              {/* <LocalizationProvider dateAdapter={AdapterDayjs}>
                 <DatePicker
                   label="Date of Birth"
                   value={formData.basicDetails.DOB}
@@ -532,7 +974,31 @@ export default function AddMemberDetails({ member, onBack, onSubmit }: AddMember
                  
        
                 />
-              </LocalizationProvider>
+
+              </LocalizationProvider> */}
+<LocalizationProvider dateAdapter={AdapterDayjs}>
+  <DatePicker
+    label="Date of Birth"
+    value={formData.basicDetails.DOB ? dayjs(formData.basicDetails.DOB) : null}
+    onChange={(newValue) => {
+      setFormData((prev) => ({
+        ...prev,
+        basicDetails: {
+          ...prev.basicDetails,
+          DOB: newValue ? newValue.toDate() : null, // Convert Dayjs to Date
+        },
+      }));
+    }}
+    slotProps={{
+      textField: {
+        fullWidth: true,
+        error: !!errors.DOB,
+        helperText: errors.DOB,
+      },
+    }}
+  />
+</LocalizationProvider>
+              
             </Grid>
             <Grid item xs={12}>
               <TextField
@@ -568,6 +1034,9 @@ export default function AddMemberDetails({ member, onBack, onSubmit }: AddMember
                 onChange={handleChange('nativeDetails', 'NativeCity')}
                 error={!!errors.NativeCity}
                 helperText={errors.NativeCity}
+                inputProps={{
+                  maxLength: 20, // Example boundary value
+                }}
               />
             </Grid>
             <Grid item xs={12} md={6}>
@@ -578,6 +1047,9 @@ export default function AddMemberDetails({ member, onBack, onSubmit }: AddMember
                 onChange={handleChange('nativeDetails', 'NativeState')}
                 error={!!errors.NativeState}
                 helperText={errors.NativeState}
+                inputProps={{
+                  maxLength: 30, // Example boundary value
+                }}
               />
             </Grid>
             <Grid item xs={12} md={6}>
@@ -588,6 +1060,10 @@ export default function AddMemberDetails({ member, onBack, onSubmit }: AddMember
                 onChange={handleChange('nativeDetails', 'NativePinCode')}
                 error={!!errors.NativePinCode}
                 helperText={errors.NativePinCode}
+                inputProps={{
+                  maxLength: 10, 
+                  minLength :5// Example boundary value
+                }}
               />
             </Grid>
             <Grid item xs={12} md={6}>
@@ -598,6 +1074,9 @@ export default function AddMemberDetails({ member, onBack, onSubmit }: AddMember
                 onChange={handleChange('nativeDetails', 'NativeContactPersonName')}
                 error={!!errors.NativeContactPersonName}
                 helperText={errors.NativeContactPersonName}
+                inputProps={{
+                  maxLength: 10, // Example boundary value
+                }}
               />
             </Grid>
             <Grid item xs={12} md={6}>
@@ -812,14 +1291,18 @@ export default function AddMemberDetails({ member, onBack, onSubmit }: AddMember
               />
             </Grid>
             <Grid item xs={12} md={6}>
-              <TextField
-                fullWidth
-                label="Mobile Number"
-                value={formData.employerDetails.MobileNumber}
-                onChange={handleChange('employerDetails', 'MobileNumber')}
-                error={!!errors.MobileNumber}
-                helperText={errors.MobileNumber}
-              />
+            <TextField
+  fullWidth
+  label="Mobile Number"
+  value={formData.employerDetails.MobileNumberemp}
+  onChange={handleChange('employerDetails', 'MobileNumberemp')}
+  error={!!errors.MobileNumber}
+  helperText={errors.MobileNumber}
+  inputProps={{
+    maxLength: 15, // Ensure the input doesn't exceed 15 characters
+    pattern: '[0-9]*', // Restrict input to digits only
+  }}
+/>
             </Grid>
             <Grid item xs={12} md={6}>
               <TextField
@@ -829,6 +1312,11 @@ export default function AddMemberDetails({ member, onBack, onSubmit }: AddMember
                 onChange={handleChange('employerDetails', 'IDNumber')}
                 error={!!errors.IDNumber}
                 helperText={errors.IDNumber}
+                inputProps={{ 
+                maxLength:20,
+                pattern: '[A-za-z0-9]*', // Restrict input to digits only
+                
+                }}
               />
             </Grid>
             <Grid item xs={12}>
@@ -941,15 +1429,15 @@ export default function AddMemberDetails({ member, onBack, onSubmit }: AddMember
               </Grid>
               <Grid item xs={12} md={6}>
                 <TextField
-                  fullWidth
-                  label="Date of Expiry"
-                  type="date"
-                  value={formData.passportDetails.DateOfExpiry}
-                  onChange={handleChange('passportDetails', 'DateOfExpiry')}
-                  InputLabelProps={{ shrink: true }}
-                  error={!!errors.DateOfExpiry}
-                  helperText={errors.DateOfExpiry}
-                />
+  fullWidth
+  label="Date of Expiry"
+  type="date"
+  value={formData.passportDetails.DateOfExpiry}
+  onChange={handleChange('passportDetails', 'DateOfExpiry')}
+  InputLabelProps={{ shrink: true }}
+  error={!!errors.DateOfExpiry}
+  helperText={errors.DateOfExpiry}
+/>
               </Grid>
               <Grid item xs={12} md={6}>
                 <TextField

@@ -94,7 +94,10 @@ const NewsMagazine: React.FC = () => {
 
   const filteredRows = rows.filter(row =>
     row.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    row.memberCode.toLowerCase().includes(searchTerm.toLowerCase())
+    row.memberCode.toLowerCase().includes(searchTerm.toLowerCase())||
+    row.subscriptionPeriod.toLowerCase().includes(searchTerm.toLowerCase())||
+    row.startDate.toLowerCase().includes(searchTerm.toLowerCase())||
+    row.endDate.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
   const handleRowClick = (params: GridRowParams) => {

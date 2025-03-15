@@ -107,11 +107,12 @@ const NAVIGATION: Navigation = [
         title: 'Users',
         icon: <ContactPageIcon />,
       },
-      {
-        segment: 'rolesandpermissions',
-        title: 'Roles and Permissions (Pending)',
-        icon: <PolicyIcon />,
-      },
+      // Need to worked on 15/10/2021
+      // {
+      //   segment: 'rolesandpermissions',
+      //   title: 'Roles and Permissions (Pending)',
+      //   icon: <PolicyIcon />,
+      // },
     ]
   
   
@@ -210,6 +211,7 @@ function UserMenu() {
   const [openConfirmDialog, setOpenConfirmDialog] = useState(false);
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
+
   const navigate = useNavigate();
 
   const handleMenu = (event: React.MouseEvent<HTMLElement>) => {
@@ -267,6 +269,11 @@ function UserMenu() {
   const handleCancelUpdate = () => {
     setOpenConfirmDialog(false);
   };
+
+
+
+
+  
 
   return (
     <>
@@ -442,8 +449,45 @@ function DemoPageContent({ pathname }: { pathname: string }) {
   const [selectedAidRequest, setSelectedAidRequest] = React.useState<string | null>(null);
   const [startDate, setStartDate] = useState<string>('');
   const [endDate, setEndDate] = useState<string>('');
-
+  const [filteredRequestStatusData, setFilteredRequestStatusData] = useState<RequestStatusData[]>([]);
+  useEffect(() => {
+    setFilteredRequestStatusData(requestStatusData);
+  }, [requestStatusData]);
+  useEffect(() => {
+    if (startDate && endDate) {
+      const filteredData = requestStatusData.filter((item) => {
+        const itemDate = new Date(item.date);
+        const start = new Date(startDate);
+        const end = new Date(endDate);
+        return itemDate >= start && itemDate <= end;
+      });
+      setFilteredRequestStatusData(filteredData);
+    } else {
+      setFilteredRequestStatusData(requestStatusData);
+    }
+  }, [startDate, endDate, requestStatusData]);
   // Add this useEffect to fetch and process the data
+
+  const validateDates = (start: string, end: string): boolean => {
+    const currentDate = new Date().toISOString().split('T')[0]; // Get current date in YYYY-MM-DD format
+    const startDateObj = new Date(start);
+    const endDateObj = new Date(end);
+  
+    // Check if start date is not more than the current date
+    if (start > currentDate) {
+      alert("Start date cannot be more than the current date.");
+      return false;
+    }
+  
+    // Check if end date is not less than the start date
+    if (end < start) {
+      alert("End date cannot be less than the start date.");
+      return false;
+    }
+  
+    return true;
+  }; 
+  
   useEffect(() => {
     const fetchAidData = async () => {
       try {
@@ -654,21 +698,21 @@ function DemoPageContent({ pathname }: { pathname: string }) {
                         />
                       </Box>
                       <ResponsiveContainer width="100%" height={300}>
-                        <BarChart data={requestStatusData}>
-                          <CartesianGrid strokeDasharray="3 3" />
-                          <XAxis dataKey="date" />
-                          <YAxis yAxisId="left" orientation="left" />
-                          <YAxis yAxisId="right" orientation="right" stroke="#82ca9d" />
-                          <Tooltip />
-                          <Legend />
-                          <Bar yAxisId="left" dataKey="underReview" fill="#ffc658" name="Under Review" />
-                          <Bar yAxisId="left" dataKey="onHold" fill="#ff9800" name="On Hold" />
-                          <Bar yAxisId="left" dataKey="sent" fill="#9c27b0" name="Yet to Start Review" />
-                          <Bar yAxisId="left" dataKey="denied" fill="#f44336" name="Denied" />
-                          <Bar yAxisId="left" dataKey="completed" fill="#4caf50" name="Completed" />
-                          <Bar yAxisId="right" dataKey="averageDaysLapsed" fill="#82ca9d" name="Avg Days Lapsed" />
-                        </BarChart>
-                      </ResponsiveContainer>
+  <BarChart data={filteredRequestStatusData}>
+    <CartesianGrid strokeDasharray="3 3" />
+    <XAxis dataKey="date" />
+    <YAxis yAxisId="left" orientation="left" />
+    <YAxis yAxisId="right" orientation="right" stroke="#82ca9d" />
+    <Tooltip />
+    <Legend />
+    <Bar yAxisId="left" dataKey="underReview" fill="#ffc658" name="Under Review" />
+    <Bar yAxisId="left" dataKey="onHold" fill="#ff9800" name="On Hold" />
+    <Bar yAxisId="left" dataKey="sent" fill="#9c27b0" name="Yet to Start Review" />
+    <Bar yAxisId="left" dataKey="denied" fill="#f44336" name="Denied" />
+    <Bar yAxisId="left" dataKey="completed" fill="#4caf50" name="Completed" />
+    <Bar yAxisId="right" dataKey="averageDaysLapsed" fill="#82ca9d" name="Avg Days Lapsed" />
+  </BarChart>
+</ResponsiveContainer>
                     </>
                   )}
                 </Paper>

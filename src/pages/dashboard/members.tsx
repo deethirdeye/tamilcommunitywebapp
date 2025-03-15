@@ -90,7 +90,9 @@ const columns: GridColDef[] = [
   const filteredRows = rows.filter(row =>
     row.applicantName.toLowerCase().includes(searchTerm.toLowerCase()) ||
     row.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    row.userCode.toLowerCase().includes(searchTerm.toLowerCase())
+    row.userCode.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    row.mobileNo.toLowerCase().includes(searchTerm.toLowerCase())||
+    row.status.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
   const handleRowClick = async (params: GridRowParams<Member>) => {
@@ -216,7 +218,21 @@ const columns: GridColDef[] = [
                     <GridToolbarFilterButton />
                     <GridToolbarDensitySelector />
                     <GridToolbarExport
-            printOptions={{ disableToolbarButton: true }} // Disable the print option here
+            printOptions={{ disableToolbarButton: true }} 
+            csvOptions={{
+              fileName: 'Members',
+              utf8WithBom: true, // Ensure UTF-8 encoding with BOM
+              getRowsToExport: (params: { api: { getSortedRowIds: () => any[]; getRow: (arg0: any) => any; }; }) => {
+                // Preprocess rows to remove leading single quotes
+                return params.api.getSortedRowIds().map((id) => {
+                  const row = params.api.getRow(id);
+                  return {
+                    ...row,
+                    mobileNo: row.mobileNo.replace(/^'/, ''), // Remove leading single quote
+                  };
+                });
+              },
+            }}
           />
                   </>
                 ),

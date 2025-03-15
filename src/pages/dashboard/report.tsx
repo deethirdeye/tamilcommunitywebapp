@@ -23,6 +23,7 @@ interface AidRequest {
   processStatus: string;
   description: string;
   userId: string;
+  createdOnDisplay: string;
 }
 
 const columns: GridColDef[] = [
@@ -61,7 +62,6 @@ export default function Report() {
       const data = await response.json();
       
       if (data.ResponseData && data.ResponseData[0]) {
-        // Filter only completed or denied requests
         const filteredRequests = data.ResponseData[0]
           .filter((item: any) => 
             item.ProcessStatus === 'Completed' || item.ProcessStatus === 'Denied' || item.ProcessStatus === 'Cancelled'
@@ -70,11 +70,12 @@ export default function Report() {
             requestId: item.RequestID,
             fullName: item.FullName,
             aidType: item.AidType,
-            createdOn:  new Date(item.CreatedOn).toLocaleDateString('en-US', {
+            createdOn: new Date(item.CreatedOn), // Store as Date object
+            createdOnDisplay: new Date(item.CreatedOn).toLocaleDateString('en-US', {
               year: 'numeric',
               month: 'short',
               day: 'numeric'
-            }),
+            }), // Store formatted string for display
             processStatus: item.ProcessStatus,
             description: item.Description,
             userId: item.UserId
@@ -92,10 +93,18 @@ export default function Report() {
     fetchRequests();
   }, []);
 
-  const filteredRows = rows.filter(row =>
-    (row.fullName.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    row.requestId.includes(searchTerm))
-  );
+  const filteredRows = rows.filter(row => {
+    const searchLower = searchTerm.toLowerCase();
+
+    // Check if the search term matches any of the fields
+    return (
+      row.fullName.toLowerCase().includes(searchLower) ||
+      row.requestId.toLowerCase().includes(searchLower) ||
+      row.aidType.toLowerCase().includes(searchLower) ||
+      row.processStatus.toLowerCase().includes(searchLower) ||
+      row.createdOnDisplay.toLowerCase().includes(searchLower) // Match the formatted date string
+    );
+  });
 
   const handleRowClick = (params: GridRowParams) => {
     setSelectedRequestId(params.row.requestId);
@@ -153,8 +162,12 @@ export default function Report() {
                 <GridToolbarFilterButton />
                 <GridToolbarDensitySelector />
                 <GridToolbarExport
-            printOptions={{ disableToolbarButton: true }} // Disable the print option here
-          />
+                  printOptions={{ disableToolbarButton: true }}
+                  csvOptions={{
+                    fileName: 'Reports',
+                    utf8WithBom: true, // Ensure UTF-8 encoding with BOM
+                  }}
+                />
               </>
             ),
           },

@@ -32,7 +32,7 @@ export const NonMemberDetails: React.FC<NonMemberDetailsProps> = ({ nonMember, o
       </Box>
       <Paper elevation={3} sx={{ flexGrow: 1, overflow: 'auto', p: 3 }}>
         <Grid container spacing={2}>
-          <DetailItem label="Non Member UserCode" value={nonMember.userCode} />
+          <DetailItem label="Non Member User Code" value={nonMember.userCode} />
           <DetailItem label="Name" value={nonMember.name} />
           <DetailItem label="Email" value={nonMember.email} />
           <DetailItem label="Mobile Number" value={nonMember.mobileNumber} />
