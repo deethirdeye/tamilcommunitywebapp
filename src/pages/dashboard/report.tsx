@@ -130,16 +130,55 @@ export default function Report() {
         borderRadius: 2,
       }}
     >
-      <Box sx={{ p: 2, display: 'flex', justifyContent: 'flex-end', alignItems: 'center' }}>
-        <TextField
-          label="Search"
-          variant="outlined"
-          size="small"
-          value={searchTerm}
-          onChange={(e) => setSearchTerm(e.target.value)}
-          sx={{ width: '250px' }}
-        />
-      </Box>
+      <Box sx={{ p: 2, display: 'flex', justifyContent: 'flex-start', alignItems: 'center' }}>
+            <TextField
+              label="Search"
+              variant="outlined"
+              size="small"
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              sx={{ width: '250px' }}
+            />
+            <Box
+              sx={{
+                ml: 1,
+                cursor: 'pointer',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                width: '24px',
+                height: '24px',
+                borderRadius: '50%',
+                backgroundColor: '#1976d2',
+                color: '#fff',
+                fontSize: '16px',
+                fontWeight: 'bold',
+                position: 'relative',
+              }}
+              onMouseEnter={(e) => {
+                const tooltip = document.createElement('div');
+                tooltip.innerText = 'You can search by Request ID, Applicant Name, Type of Aid and Status';
+                tooltip.style.position = 'absolute';
+                tooltip.style.backgroundColor = '#000';
+                tooltip.style.color = '#fff';
+                tooltip.style.padding = '5px';
+                tooltip.style.borderRadius = '5px';
+                tooltip.style.top = `${e.clientY + 10}px`;
+                tooltip.style.left = `${e.clientX + 10}px`;
+                tooltip.style.zIndex = '1000';
+                tooltip.id = 'search-tooltip';
+                document.body.appendChild(tooltip);
+              }}
+              onMouseLeave={() => {
+                const tooltip = document.getElementById('search-tooltip');
+                if (tooltip) {
+                document.body.removeChild(tooltip);
+                }
+              }}
+              >
+              <i className="material-icons">i</i>
+              </Box>
+          </Box>
       <DataGrid
         rows={filteredRows}
         columns={columns}

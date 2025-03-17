@@ -168,7 +168,7 @@ const NonMembers: React.FC<NonMembersProps> = ({ userCode, onBack }) => {
             borderRadius: 2,
           }}
         >
-          <Box sx={{ p: 2, display: 'flex', justifyContent: 'space-between', alignItems: 'center', height: '5' }}>
+          <Box sx={{ p: 2, display: 'flex', justifyContent: 'flex-start', alignItems: 'center' }}>
             <TextField
               label="Search"
               variant="outlined"
@@ -177,13 +177,45 @@ const NonMembers: React.FC<NonMembersProps> = ({ userCode, onBack }) => {
               onChange={(e) => setSearchTerm(e.target.value)}
               sx={{ width: '250px' }}
             />
-            {/* <Button
-              variant="contained"
-              startIcon={<AddIcon />}
-              onClick={handleAddNonMember}
-            >
-              Add Non Member
-            </Button> */}
+            <Box
+              sx={{
+                ml: 1,
+                cursor: 'pointer',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                width: '24px',
+                height: '24px',
+                borderRadius: '50%',
+                backgroundColor: '#1976d2',
+                color: '#fff',
+                fontSize: '16px',
+                fontWeight: 'bold',
+                position: 'relative',
+              }}
+              onMouseEnter={(e) => {
+                const tooltip = document.createElement('div');
+                tooltip.innerText = 'You can search by Non MemberUser Code, Name, Email, Mobile No., and Added by Member Code';
+                tooltip.style.position = 'absolute';
+                tooltip.style.backgroundColor = '#000';
+                tooltip.style.color = '#fff';
+                tooltip.style.padding = '5px';
+                tooltip.style.borderRadius = '5px';
+                tooltip.style.top = `${e.clientY + 10}px`;
+                tooltip.style.left = `${e.clientX + 10}px`;
+                tooltip.style.zIndex = '1000';
+                tooltip.id = 'search-tooltip';
+                document.body.appendChild(tooltip);
+              }}
+              onMouseLeave={() => {
+                const tooltip = document.getElementById('search-tooltip');
+                if (tooltip) {
+                document.body.removeChild(tooltip);
+                }
+              }}
+              >
+              <i className="material-icons">i</i>
+              </Box>
           </Box>
           <DataGrid
             rows={filteredRows}

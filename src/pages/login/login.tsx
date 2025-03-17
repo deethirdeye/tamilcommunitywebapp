@@ -81,6 +81,7 @@ const Login: React.FC = () => {
           localStorage.setItem('loggedInUserId', userData.UserID.toString());
           localStorage.setItem('userCode', userData.UserCode);
           localStorage.setItem('token', userData.Token);
+          localStorage.setItem('fullName', userData.FullName);
           navigate('/dashboard', { replace: true });
         } else {
           // If RoleID is 1 or less, show an error

@@ -24,6 +24,7 @@ import StopIcon from '@mui/icons-material/Stop';
 
 // Mock data - replace this with actual data fetching logic
 
+
 interface AidViewProps {
   requestId: string;
   onBack: () => void;
@@ -437,8 +438,7 @@ export default function AidView({ requestId, onBack }: AidViewProps) {
       });
 
       const data = await response.json();
-      const userName= localStorage.getItem('fullName') || '';
-   
+
       if (data.ResponseCode === 1) {
         const newCommentObj: Comment = {
           CommentID: comments.length + 1,
@@ -447,7 +447,7 @@ export default function AidView({ requestId, onBack }: AidViewProps) {
           Comment: newComment.trim(),
           AdminUserFlg: 1,
           Status: 1,
-          Name: userName, // Replace with actual user name
+          Name: newComment.trim(),
           CreatedOn: new Date().toISOString(),
           AttachmentPath: attachmentPath || '',
           RecordingPath: '',
@@ -667,12 +667,6 @@ export default function AidView({ requestId, onBack }: AidViewProps) {
     return `${minutes}:${seconds.toString().padStart(2, '0')}`;
   };
 
-  const convertToMalaysiaTime = (utcDate: string) => {
-    const date = new Date(utcDate);
-    const malaysiaTime = date.toLocaleString('en-MY', { timeZone: 'Asia/Kuala_Lumpur' });
-    return malaysiaTime;
-  };
-
   if (showMemberDetails && selectedMember?.details) {
     return (
       <MemberDetails 
@@ -810,7 +804,7 @@ export default function AidView({ requestId, onBack }: AidViewProps) {
               }
               secondary={
                 <Typography variant="caption">
-                  {comment.CreatedOn ? convertToMalaysiaTime(comment.CreatedOn) : 'No date'}
+                  {comment.CreatedOn ? new Date(comment.CreatedOn.replace('T', ' ')).toLocaleString() : 'No date'}
                 </Typography>
               }
             />
