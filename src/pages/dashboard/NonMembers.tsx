@@ -195,7 +195,7 @@ const NonMembers: React.FC<NonMembersProps> = ({ userCode, onBack }) => {
               }}
               onMouseEnter={(e) => {
                 const tooltip = document.createElement('div');
-                tooltip.innerText = 'You can search by Non Member User Code, Name, Email, Mobile No., and Added by Member Code';
+                tooltip.innerText = 'You can search by Non MemberUser Code, Name, Email, Mobile No., and Added by Member Code';
                 tooltip.style.position = 'absolute';
                 tooltip.style.backgroundColor = '#000';
                 tooltip.style.color = '#fff';
