@@ -90,13 +90,8 @@ interface PassportDetails {
   DateOfExpiry: string;
   PlaceOfIssue: string;
 }
-interface MemberDetailsProps {
-  memberCode: string; 
-  userId: string;
-  onBack: () => void;
-  onMemberDeleted: () => void; // Add this prop
-}
-export default function MemberDetails({ memberCode, userId, onBack, onMemberDeleted }: MemberDetailsProps) {
+
+export default function MemberDetails({ memberCode, userId, onBack }: MemberDetailsProps) {
   const theme = useTheme();
   const [openDialog, setOpenDialog] = useState(false);
   const [openSuccessPopup, setOpenSuccessPopup] = useState(false);
@@ -108,39 +103,7 @@ export default function MemberDetails({ memberCode, userId, onBack, onMemberDele
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [logs, setLogs] = useState<Array<{ date: string; action: string; comment: string }>>([]);
-  const handleConfirmRemove = async () => {
-    try {
-      const response = await fetch(
-        `${AppConfig.API_BASE_URL}/Account/DeleteAdminUser?userCode=${memberCode}`,
-        {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({
-            Status: 0,
-            LastModifiedOn: new Date().toISOString(),
-            LastModifiedBy: localStorage.getItem('loggedInUserId') || '0'
-          }),
-        }
-      );
 
-      const data = await response.json();
-      if (data.ResponseCode === 1) {
-        setOpenDialog(false);
-        setOpenSuccessPopup(true);
-        setTimeout(() => {
-          onBack();
-          onMemberDeleted(); // Call the callback function to refresh the member list
-        }, 1000);
-      } else {
-        alert(data.ErrorDesc || 'Failed to remove member');
-      }
-    } catch (error) {
-      console.error('Error removing member:', error);
-      alert('An error occurred while removing the member');
-    }
-  };
   useEffect(() => {
     const fetchMemberDetails = async () => {
       setLoading(true);
@@ -207,38 +170,38 @@ export default function MemberDetails({ memberCode, userId, onBack, onMemberDele
     setOpenDialog(true);
   };
 
-  // const handleConfirmRemove = async () => {
-  //   try {
-  //     const response = await fetch(
-  //       `${AppConfig.API_BASE_URL}/Account/DeleteAdminUser?userCode=${memberCode}`,
-  //       {
-  //         method: 'POST',
-  //         headers: {
-  //           'Content-Type': 'application/json',
-  //         },
-  //         body: JSON.stringify({
-  //           Status: 0,
-  //           LastModifiedOn: new Date().toISOString(),
-  //           LastModifiedBy: localStorage.getItem('loggedInUserId') || '0'
-  //         }),
-  //       }
-  //     );
+  const handleConfirmRemove = async () => {
+    try {
+      const response = await fetch(
+        `${AppConfig.API_BASE_URL}/Account/DeleteAdminUser?userCode=${memberCode}`,
+        {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            Status: 0,
+            LastModifiedOn: new Date().toISOString(),
+            LastModifiedBy: localStorage.getItem('loggedInUserId') || '0'
+          }),
+        }
+      );
 
-  //     const data = await response.json();
-  //     if (data.ResponseCode === 1) {
-  //       setOpenDialog(false);
-  //       setOpenSuccessPopup(true);
-  //       setTimeout(() => {
-  //         onBack();
-  //       }, 1000);
-  //     } else {
-  //       alert(data.ErrorDesc || 'Failed to remove member');
-  //     }
-  //   } catch (error) {
-  //     console.error('Error removing member:', error);
-  //     alert('An error occurred while removing the member');
-  //   }
-  // };
+      const data = await response.json();
+      if (data.ResponseCode === 1) {
+        setOpenDialog(false);
+        setOpenSuccessPopup(true);
+        setTimeout(() => {
+          onBack();
+        }, 1000);
+      } else {
+        alert(data.ErrorDesc || 'Failed to remove member');
+      }
+    } catch (error) {
+      console.error('Error removing member:', error);
+      alert('An error occurred while removing the member');
+    }
+  };
 
   const handleActivate = () => {
     setOpenActivateDialog(true);

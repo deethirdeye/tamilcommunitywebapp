@@ -632,7 +632,10 @@ function DemoPageContent({ pathname }: { pathname: string }) {
     const fifteenDaysAgo = subDays(new Date(), 15);
     return rows.filter((row: any) => new Date(row.dateSubmitted) >= fifteenDaysAgo);
   };
+  const maxLabelLength = Math.max(...aidTypeData.map(item => item.name.length));
 
+  // Dynamically set the X-axis height based on the maximum label length
+  const xAxisHeight = Math.max(30, maxLabelLength * 6 + 50);
   return (
     <Box sx={{ display: 'flex', height: '100vh', overflow: 'hidden' }}>
       <Box component="main" sx={{ flexGrow: 1, display: 'flex', 
@@ -650,7 +653,7 @@ function DemoPageContent({ pathname }: { pathname: string }) {
             {/* Existing Aid Type and Pending Requests charts */}
             <Grid container spacing={3} sx={{ mb: 3 }}>
               <Grid item xs={12} md={6}>
-                <Paper sx={{ p: 2 }}>
+                {/* <Paper sx={{ p: 2 }}>
                   <Typography variant="h6" gutterBottom>Type of Aid</Typography>
                   {isLoading ? (
                     <Box sx={{ display: 'flex', justifyContent: 'center', p: 3 }}>
@@ -668,7 +671,37 @@ function DemoPageContent({ pathname }: { pathname: string }) {
                       </BarChart>
                     </ResponsiveContainer>
                   )}
-                </Paper>
+                </Paper> */}
+                
+                <Paper sx={{ p: 2 }}>
+  <Typography variant="h6" gutterBottom>Type of Aid</Typography>
+  {isLoading ? (
+    <Box sx={{ display: 'flex', justifyContent: 'center', p: 3 }}>
+      <CircularProgress />
+    </Box>
+  ) : (
+    <ResponsiveContainer width="100%" height={380}>
+      <BarChart data={aidTypeData}>
+        <CartesianGrid strokeDasharray="3 3" />
+        <XAxis 
+          dataKey="name" 
+          angle={-45} // Rotate labels by -45 degrees for better readability
+          textAnchor="end" // Align the text to the end of the tick
+          interval={0} // Ensure all labels are displayed
+          dy={10} // Adjust vertical position for better alignment
+          height={xAxisHeight} // Increase height to accommodate rotated labels
+        />
+        <YAxis />
+        <Tooltip />
+        <Legend 
+          verticalAlign="top" // Position the legend at the top
+           // Align the legend to the right
+        />
+        <Bar dataKey="count" fill="#8884d8" name="Number of Requests" />
+      </BarChart>
+    </ResponsiveContainer>
+  )}
+</Paper>
               </Grid>
               <Grid item xs={12} md={6}>
                 <Paper sx={{ p: 2 }}>

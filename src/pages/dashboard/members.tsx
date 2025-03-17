@@ -39,7 +39,19 @@ export default function Members() {
   const [rows, setRows] = React.useState<Member[]>([]);
   const [isAddingMember, setIsAddingMember] = React.useState(false);
   const [selectedMember, setSelectedMember] = useState<Member | null>(null);
-
+  const handleMemberDeleted = () => {
+    fetchMembers(); // Re-fetch members to get the updated data
+  };
+  
+  // Inside the return statement, where you render the MemberDetails component:
+  {selectedMember && (
+    <MemberDetails 
+      memberCode={selectedMember.userCode}
+      userId={selectedMember.id}
+      onBack={() => setSelectedMember(null)}
+      onMemberDeleted={handleMemberDeleted} // Pass the callback function
+    />
+  )}
   const fetchMembers = async () => {
     try {
       const response = await fetch(`${AppConfig.API_BASE_URL}/Account/GetUserMaster`);
@@ -166,6 +178,7 @@ const columns: GridColDef[] = [
             memberCode={selectedMember.userCode}
             userId={selectedMember.id}
             onBack={() => setSelectedMember(null)}
+            onMemberDeleted={handleMemberDeleted}
           />
         )
       ) : (
