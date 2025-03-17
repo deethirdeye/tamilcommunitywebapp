@@ -181,15 +181,56 @@ const columns: GridColDef[] = [
             borderRadius: 2,
           }}
         >
-          <Box sx={{ p: 2, display: 'flex', justifyContent: 'space-between', alignItems: 'center', height: '5' }}>
-            <TextField
+            <Box sx={{ p: 2, display: 'flex', justifyContent: 'space-between', alignItems: 'center', height: '5' }}>
+            <Box sx={{ display: 'flex', alignItems: 'center' }}>
+              <TextField
               label="Search"
               variant="outlined"
               size="small"
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
               sx={{ width: '250px' }}
-            />
+              />
+              <Box
+              sx={{
+                ml: 1,
+                cursor: 'pointer',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                width: '24px',
+                height: '24px',
+                borderRadius: '50%',
+                backgroundColor: '#1976d2',
+                color: '#fff',
+                fontSize: '16px',
+                fontWeight: 'bold',
+                position: 'relative',
+              }}
+              onMouseEnter={(e) => {
+                const tooltip = document.createElement('div');
+                tooltip.innerText = 'You can search by User Code, Applicant Name, Email, Mobile No., and Status';
+                tooltip.style.position = 'absolute';
+                tooltip.style.backgroundColor = '#000';
+                tooltip.style.color = '#fff';
+                tooltip.style.padding = '5px';
+                tooltip.style.borderRadius = '5px';
+                tooltip.style.top = `${e.clientY + 10}px`;
+                tooltip.style.left = `${e.clientX + 10}px`;
+                tooltip.style.zIndex = '1000';
+                tooltip.id = 'search-tooltip';
+                document.body.appendChild(tooltip);
+              }}
+              onMouseLeave={() => {
+                const tooltip = document.getElementById('search-tooltip');
+                if (tooltip) {
+                document.body.removeChild(tooltip);
+                }
+              }}
+              >
+              <i className="material-icons">i</i>
+              </Box>
+            </Box>
             <Button
               variant="contained"
               startIcon={<AddIcon />}
@@ -197,7 +238,7 @@ const columns: GridColDef[] = [
             >
               Add Member
             </Button>
-          </Box>
+            </Box>
           <DataGrid
             rows={filteredRows}
             columns={columns}
@@ -222,16 +263,7 @@ const columns: GridColDef[] = [
             csvOptions={{
               fileName: 'Members',
               utf8WithBom: true, // Ensure UTF-8 encoding with BOM
-              getRowsToExport: (params: { api: { getSortedRowIds: () => any[]; getRow: (arg0: any) => any; }; }) => {
-                // Preprocess rows to remove leading single quotes
-                return params.api.getSortedRowIds().map((id) => {
-                  const row = params.api.getRow(id);
-                  return {
-                    ...row,
-                    mobileNo: row.mobileNo.replace(/^'/, ''), // Remove leading single quote
-                  };
-                });
-              },
+             
             }}
           />
                   </>

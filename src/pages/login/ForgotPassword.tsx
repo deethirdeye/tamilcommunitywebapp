@@ -30,7 +30,7 @@ const ForgotPassword: React.FC<ForgotPasswordProps> = ({ onBackToLogin, onVerifi
     setIsLoading(true);
 
     try {
-      const response = await fetch(`${AppConfig.API_BASE_URL}/Account/forgot-password`, {
+      const response = await fetch(`${AppConfig.API_BASE_URL}/Account/forgot-password-admin`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -44,7 +44,7 @@ const ForgotPassword: React.FC<ForgotPasswordProps> = ({ onBackToLogin, onVerifi
         alert('Verification code has been sent to your email');
         onVerificationSent(email);
       } else {
-        alert(data.ErrorDesc || 'Failed to send verification code');
+        alert(data.ErrorDesc || 'This email is not registered with us');
       }
     } catch (error) {
       console.error('Error:', error);
