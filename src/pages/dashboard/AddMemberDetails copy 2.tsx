@@ -60,7 +60,7 @@ interface FormData {
   employerDetails: {
     EmployerFullName: string;
     CompanyName: string;
-    MobileNumber: string;
+    MobileNumberemp: string;
     IDNumber: string;
     EmployerAddress: string;
     City: string;
@@ -87,7 +87,6 @@ interface FormData {
 }
 
 export default function AddMemberDetails({ member, onBack, onSubmit }: AddMemberDetailsProps) {
-  console.log('member', member.mobileNo );
   const [activeTab, setActiveTab] = useState(0);
   const [formData, setFormData] = useState<FormData>({
     basicDetails: {
@@ -95,7 +94,7 @@ export default function AddMemberDetails({ member, onBack, onSubmit }: AddMember
       DOB: null,
       CurrentLocation: '',
       FullName: member.applicantName || '',
-      MobileNumber: String(member.mobileNo) || ''
+      MobileNumber: member.mobileNo || ''
     },
     nativeDetails: {
       NativeAddress: '',
@@ -130,7 +129,7 @@ export default function AddMemberDetails({ member, onBack, onSubmit }: AddMember
     employerDetails: {
       EmployerFullName: '',
       CompanyName: '',
-      MobileNumber: '',
+      MobileNumberemp: '',
       IDNumber: '',
       EmployerAddress: '',
       City: '',
@@ -150,7 +149,7 @@ export default function AddMemberDetails({ member, onBack, onSubmit }: AddMember
     AdminUserLogin: {
       UserId: member.id,
       Email: member.email,
-      MobileNumber: String(member.mobileNo),
+      MobileNumber: member.mobileNo,
       UserCode: member.userCode,
       Password: ''
     }
@@ -241,8 +240,8 @@ export default function AddMemberDetails({ member, onBack, onSubmit }: AddMember
     const mobileNumber = formData.basicDetails.MobileNumber.trim();
     if (!mobileNumber) {
       basicErrors.MobileNumber = 'Mobile Number is required';
-    } else if (mobileNumber.length < 8 || mobileNumber.length > 15)  {
-      basicErrors.MobileNumber = 'Mobile Number must be 8-15 digits (international format)';
+    } else if (!/^\d{8,15}$/.test(mobileNumber)) {
+      basicErrors.MobileNumber = 'Mobile Number must be 8-15 digits';
     }
   
     // Date of Birth: Not in future, not before 1900
@@ -494,11 +493,11 @@ export default function AddMemberDetails({ member, onBack, onSubmit }: AddMember
     }
   
     // Mobile Number: 8-15 digits (international format)
-    const mobileNumberemp = formData.employerDetails.MobileNumber.trim();
-    if (!mobileNumberemp) {
-      employerErrors.MobileNumber = 'Mobile Number is required';
-    } else if (!/^\d{8,15}$/.test(mobileNumberemp)) {
-      employerErrors.MobileNumber = 'Mobile Number must be 8-15 digits';
+    const mobileNumber1 = formData.employerDetails.MobileNumberemp.trim();
+    if (!mobileNumber1) {
+      employerErrors.MobileNumberemp = 'Mobile Number is required';
+    } else if (!/^\d{8,15}$/.test(mobileNumber1)) {
+      employerErrors.MobileNumberemp = 'Mobile Number must be 8-15 digits';
     }
   
     // ID Number: 6-20 alphanumeric characters
@@ -745,7 +744,22 @@ export default function AddMemberDetails({ member, onBack, onSubmit }: AddMember
     return currentErrors;
   };
 
+  // Handle tab change with validation
+  const handleTabChange = (newValue: number) => {
+    // Validate current tab before changing
+    const currentErrors = validateCurrentTab();
+    
+    if (Object.keys(currentErrors).length > 0) {
+      setErrors(currentErrors);
+      setSnackbarMessage('Please fill in all required fields and check if you have entered all the date fields correctly');
+      setOpenSnackbar(true);
+      return;
+    }
 
+    // Clear previous errors if validation passes
+    setErrors({});
+    setActiveTab(newValue);
+  };
   const handleSubmit = async (event: React.FormEvent) => {
     event.preventDefault();
   
@@ -1277,18 +1291,18 @@ export default function AddMemberDetails({ member, onBack, onSubmit }: AddMember
               />
             </Grid>
             <Grid item xs={12} md={6}>
-                        <TextField
-              fullWidth
-              label="Mobile Number"
-              value={formData.employerDetails.MobileNumber}
-              onChange={handleChange('employerDetails', 'MobileNumber')}
-              error={!!errors.MobileNumberemp}
-              helperText={errors.MobileNumberemp}
-              inputProps={{
-                maxLength: 15, // Ensure the input doesn't exceed 15 characters
-                pattern: '[0-9]*', // Restrict input to digits only
-              }}
-            />
+            <TextField
+  fullWidth
+  label="Mobile Number"
+  value={formData.employerDetails.MobileNumberemp}
+  onChange={handleChange('employerDetails', 'MobileNumberemp')}
+  error={!!errors.MobileNumber}
+  helperText={errors.MobileNumber}
+  inputProps={{
+    maxLength: 15, // Ensure the input doesn't exceed 15 characters
+    pattern: '[0-9]*', // Restrict input to digits only
+  }}
+/>
             </Grid>
             <Grid item xs={12} md={6}>
               <TextField

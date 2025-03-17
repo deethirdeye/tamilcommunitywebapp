@@ -663,18 +663,18 @@ export default function AidView({ requestId, onBack }: AidViewProps) {
     return `${minutes}:${seconds.toString().padStart(2, '0')}`;
   };
 
-  if (showMemberDetails && selectedMember?.details) {
-    return (
-      <MemberDetails 
-        memberCode={aidDetails.memberCode}
-        userId={selectedMember.details.UserId || aidDetails.memberCode} // Use the correct user ID
-        onBack={() => {
-          setShowMemberDetails(false);
-          setSelectedMember(null);
-        }}
-      />
-    );
-  }
+  // if (showMemberDetails && selectedMember?.details) {
+  //   return (
+  //     <MemberDetails 
+  //       memberCode={aidDetails.memberCode}
+  //       userId={selectedMember.details.UserId || aidDetails.memberCode} // Use the correct user ID
+  //       onBack={() => {
+  //         setShowMemberDetails(false);
+  //         setSelectedMember(null);
+  //       }}
+  //     />
+  //   );
+  // }
 
   console.log('Current comments state:', comments);
 
