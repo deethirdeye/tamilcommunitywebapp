@@ -231,6 +231,14 @@ function UserMenu() {
     // Add any logout logic here (e.g., clearing tokens or state)
     navigate('/login');
     handleClose();
+ 
+      localStorage.removeItem('userToken');
+      localStorage.removeItem('loggedInUserId');
+      localStorage.removeItem('userCode');
+      localStorage.removeItem('token');
+      localStorage.removeItem('fullName');
+      navigate('/login', { replace: true });
+   
   };
 
   const handleCloseEditDialog = () => {
@@ -271,7 +279,15 @@ function UserMenu() {
   };
 
 
+  const navigates = useNavigate();
 
+  useEffect(() => {
+    const isAuthenticated = localStorage.getItem('userToken') !== null;
+
+    if (!isAuthenticated) {
+      navigates('/login', { replace: true });
+    }
+  }, [navigates]);
 
   
 
