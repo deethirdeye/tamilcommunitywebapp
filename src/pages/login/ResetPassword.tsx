@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Box, Typography, TextField, Button, Link } from '@mui/material';
+import { Box, Typography, TextField, Button, Link, Snackbar, Alert } from '@mui/material';
 import useStyles from '../../styles/styles';
 import AppConfig from '../../AppConfig';
 
@@ -20,6 +20,7 @@ const ResetPassword: React.FC<ResetPasswordProps> = ({ email, onBackToLogin, onP
     confirmPassword: '',
   });
   const [isLoading, setIsLoading] = useState(false);
+  const [snackbar, setSnackbar] = useState({ open: false, message: '', severity: 'success' as 'success' | 'error' });
 
   const validateFields = () => {
     const newErrors = {
@@ -61,14 +62,14 @@ const ResetPassword: React.FC<ResetPasswordProps> = ({ email, onBackToLogin, onP
       const data = await response.json();
 
       if (data.ResponseCode === 1) {
-        alert('Password reset successful');
+        setSnackbar({ open: true, message: 'Password reset successful', severity: 'success' });
         onPasswordReset();
       } else {
-        alert(data.ErrorDesc || 'Failed to reset password');
+        setSnackbar({ open: true, message: data.ErrorDesc || 'Failed to reset password', severity: 'error' });
       }
     } catch (error) {
       console.error('Error:', error);
-      alert('An error occurred while resetting password');
+      setSnackbar({ open: true, message: 'An error occurred while resetting password', severity: 'error' });
     } finally {
       setIsLoading(false);
     }
@@ -128,6 +129,16 @@ const ResetPassword: React.FC<ResetPasswordProps> = ({ email, onBackToLogin, onP
       <Link href="#" className={classes.forgotPassword} onClick={onBackToLogin}>
         ← Back to Login
       </Link>
+      <Snackbar
+        open={snackbar.open}
+        autoHideDuration={4000}
+        onClose={() => setSnackbar({ ...snackbar, open: false })}
+        anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}
+      >
+        <Alert onClose={() => setSnackbar({ ...snackbar, open: false })} severity={snackbar.severity} sx={{ width: '100%' }}>
+          {snackbar.message}
+        </Alert>
+      </Snackbar>
     </Box>
   );
 };

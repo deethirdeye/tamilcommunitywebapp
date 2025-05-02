@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { Box, Typography, Button, Grid, TextField, Tabs, Tab, Alert, Snackbar } from '@mui/material';
+import MuiAlert, { AlertColor } from '@mui/material/Alert';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import { LocalizationProvider, DatePicker } from '@mui/x-date-pickers';
 import AppConfig from '../../AppConfig';
@@ -156,65 +157,15 @@ export default function AddMemberDetails({ member, onBack, onSubmit }: AddMember
     }
   });
   const [errors, setErrors] = useState<{[key: string]: string}>({});
-  const [openSnackbar, setOpenSnackbar] = useState(false);
+  const [snackbarOpen, setSnackbarOpen] = useState(false);
   const [snackbarMessage, setSnackbarMessage] = useState('');
-  // const validateBasicDetails = () => {
-  //   const basicErrors: { [key: string]: string } = {};
-  
-  //   // Full Name: 2-50 characters
-  //   const fullName = formData.basicDetails.FullName.trim();
-  //   if (!fullName) {
-  //     basicErrors.FullName = 'Full Name is required';
-  //   } else if (fullName.length < 3 || fullName.length > 50) {
-  //     basicErrors.FullName = 'Full Name must be between 3 and 50 characters';
-  //   }
-  
-  //   // Email: Valid format, 5-100 characters
-  //   const email = formData.basicDetails.Email.trim();
-  //   if (!email) {
-  //     basicErrors.Email = 'Email is required';
-  //   } else if (!/\S+@\S+\.\S+/.test(email)) {
-  //     basicErrors.Email = 'Invalid email format';
-  //   } else if (email.length < 5 || email.length > 100) {
-  //     basicErrors.Email = 'Email must be between 5 and 100 characters';
-  //   }
-  
-  //   // Mobile Number: 8-15 digits
-  //   const mobileNumber = formData.basicDetails.MobileNumber.trim();
-  //   if (!mobileNumber) {
-  //     basicErrors.MobileNumberbasic = 'Mobile Number is required';
-  //   } else if (!/^\d{9,15}$/.test(mobileNumber)) {
-  //     basicErrors.MobileNumberbasic = 'Mobile Number must be 9-15 digits';
-  //   }
-  
-  //   // Date of Birth: Not in future, not before 1900
-  //   const dob = formData.basicDetails.DOB;
-  //   if (!dob) {
-  //     basicErrors.dob = 'DOB  is required';
-  //   } 
-  //   const dobObj = dob ? new Date(dob) : new Date('');
-  //   const currentDate = new Date();
-  //   const minDate = new Date('1900-01-01');
-  //   if (!dob) {
-  //     basicErrors.DOB = 'Date of Birth is required';
-  //   } else if (isNaN(dobObj.getTime())) {
-  //     basicErrors.DOB = 'Invalid Date of Birth';
-  //   } else if (dobObj > currentDate) {
-  //     basicErrors.DOB = 'Date of Birth cannot be in the future';
-  //   } else if (dobObj < minDate) {
-  //     basicErrors.DOB = 'Date of Birth cannot be before 1900';
-  //   }
-  
-  //   // Current Location: 2-100 characters
-  //   const currentLocation = formData.basicDetails.CurrentLocation.trim();
-  //   if (!currentLocation) {
-  //     basicErrors.CurrentLocation = 'Current Location is required';
-  //   } else if (currentLocation.length < 2 || currentLocation.length > 100) {
-  //     basicErrors.CurrentLocation = 'Current Location must be between 2 and 100 characters';
-  //   }
-  
-  //   return basicErrors;
-  // };
+  const [snackbarSeverity, setSnackbarSeverity] = useState<AlertColor>('success');
+
+  const showSnackbar = (message: string, severity: AlertColor = 'success') => {
+    setSnackbarMessage(message);
+    setSnackbarSeverity(severity);
+    setSnackbarOpen(true);
+  };
 
   const validateBasicDetails = () => {
     const basicErrors: { [key: string]: string } = {};
@@ -554,84 +505,6 @@ export default function AddMemberDetails({ member, onBack, onSubmit }: AddMember
     return employerErrors;
   };
 
-  // const validatePassportDetails = () => {
-  //   const passportErrors: { [key: string]: string } = {};
-  
-  //   // Passport Number: Required, alphanumeric only, 6-12 characters
-  //   const passportNumber = formData.passportDetails.PassportNumber.trim();
-  //   if (!passportNumber) {
-  //     passportErrors.PassportNumber = 'Passport Number is required';
-  //   } else if (!/^[a-zA-Z0-9]+$/.test(passportNumber)) {
-  //     passportErrors.PassportNumber = 'Passport Number must contain only letters and numbers (no special characters)';
-  //   } else if (passportNumber.length < 6 || passportNumber.length > 12) {
-  //     passportErrors.PassportNumber = 'Passport Number must be between 6 and 12 characters';
-  //   }
-  
-  //   // Surname: Required, 2-50 characters
-  //   const surname = formData.passportDetails.Surname.trim();
-  //   if (!surname) {
-  //     passportErrors.Surname = 'Surname is required';
-  //   } else if (surname.length < 2 || surname.length > 50) {
-  //     passportErrors.Surname = 'Surname must be between 2 and 50 characters';
-  //   }
-  
-  //   // Given Names: Required, 2-50 characters
-  //   const givenNames = formData.passportDetails.GivenNames.trim();
-  //   if (!givenNames) {
-  //     passportErrors.GivenNames = 'Given Names are required';
-  //   } else if (givenNames.length < 2 || givenNames.length > 50) {
-  //     passportErrors.GivenNames = 'Given Names must be between 2 and 50 characters';
-  //   }
-  
-  //   // Nationality: Required, 2-50 characters
-  //   const nationality = formData.passportDetails.Nationality.trim();
-  //   if (!nationality) {
-  //     passportErrors.Nationality = 'Nationality is required';
-  //   } else if (nationality.length < 2 || nationality.length > 50) {
-  //     passportErrors.Nationality = 'Nationality must be between 2 and 50 characters';
-  //   }
-  
-  //   // Date of Issue: Required, not in future, not before 1900
-  //   const dateOfIssue = formData.passportDetails.DateOfIssue.trim();
-  //   const currentDate = new Date();
-  //   const minDate = new Date('1900-01-01');
-  //   const issueDateObj = new Date(dateOfIssue);
-  //   if (!dateOfIssue) {
-  //     passportErrors.DateOfIssue = 'Date of Issue is required';
-  //   } else if (isNaN(issueDateObj.getTime())) {
-  //     passportErrors.DateOfIssue = 'Invalid Date of Issue';
-  //   } else if (issueDateObj > currentDate) {
-  //     passportErrors.DateOfIssue = 'Date of Issue cannot be in the future';
-  //   } else if (issueDateObj < minDate) {
-  //     passportErrors.DateOfIssue = 'Date of Issue cannot be before 1900';
-  //   }
-  
-  //   // Date of Expiry: Required, after Date of Issue, not more than 20 years from today
-  //   const dateOfExpiry = formData.passportDetails.DateOfExpiry.trim();
-  //   const expiryDateObj = new Date(dateOfExpiry);
-  //   const maxExpiryDate = new Date();
-  //   maxExpiryDate.setFullYear(maxExpiryDate.getFullYear() + 20); // 20 years from today
-  //   if (!dateOfExpiry) {
-  //     passportErrors.DateOfExpiry = 'Date of Expiry is required';
-  //   } else if (isNaN(expiryDateObj.getTime())) {
-  //     passportErrors.DateOfExpiry = 'Invalid Date of Expiry';
-  //   } else if (dateOfIssue && expiryDateObj <= issueDateObj) {
-  //     passportErrors.DateOfExpiry = 'Expiry date must be later than the Date of Issue';
-  //   } else if (expiryDateObj > maxExpiryDate) {
-  //     passportErrors.DateOfExpiry = 'Expiry date cannot be more than 20 years from today';
-  //   }
-  
-  //   // Place of Issue: Required, 2-100 characters
-  //   const placeOfIssue = formData.passportDetails.PlaceOfIssue.trim();
-  //   if (!placeOfIssue) {
-  //     passportErrors.PlaceOfIssue = 'Place of Issue is required';
-  //   } else if (placeOfIssue.length < 2 || placeOfIssue.length > 100) {
-  //     passportErrors.PlaceOfIssue = 'Place of Issue must be between 2 and 500 characters';
-  //   }
-  
-  //   return passportErrors;
-  // };
-
   const validatePassportDetails = () => {
     const passportErrors: { [key: string]: string } = {};
   
@@ -716,7 +589,6 @@ export default function AddMemberDetails({ member, onBack, onSubmit }: AddMember
     return passportErrors;
   };
 
-  // Validation function to check current tab
   const validateCurrentTab = () => {
     let currentErrors = {};
     switch (activeTab) {
@@ -745,7 +617,6 @@ export default function AddMemberDetails({ member, onBack, onSubmit }: AddMember
     return currentErrors;
   };
 
-
   const handleSubmit = async (event: React.FormEvent) => {
     event.preventDefault();
   
@@ -763,8 +634,7 @@ export default function AddMemberDetails({ member, onBack, onSubmit }: AddMember
   
     if (Object.keys(allErrors).length > 0) {
       setErrors(allErrors);
-      setSnackbarMessage('Please fill in all required fields and check if you have entered all the date fields correctly');
-      setOpenSnackbar(true);
+      showSnackbar('Please fill in all required fields and check if you have entered all the date fields correctly', 'error');
       return;
     }
   
@@ -779,57 +649,16 @@ export default function AddMemberDetails({ member, onBack, onSubmit }: AddMember
   
       const data = await response.json();
       if (data.ResponseCode === 1) {
-        alert('Details added successfully');
+        showSnackbar('Details added successfully', 'success');
         onSubmit();
       } else {
-        alert(data.Message || 'Failed to add details');
+        showSnackbar(data.Message || 'Failed to add details', 'error');
       }
     } catch (error) {
       console.error('Error adding details:', error);
-      alert('An error occurred while adding details');
+      showSnackbar('An error occurred while adding details', 'error');
     }
   };
-  // const handleSubmit = async (event: React.FormEvent) => {
-  //   event.preventDefault();
-
-  //   const allErrors = {
-  //     ...validateBasicDetails(),
-  //     ...validateNativeDetails(),
-  //     ...validateMalaysiaWorkDetails(),
-  //     ...validateMalaysiaResidenceDetails(),
-  //     ...validateEmergencyDetails(),
-  //     ...validateEmployerDetails(),
-  //     ...validatePassportDetails()
-  //   };
-
-    
-  //   if (Object.keys(allErrors).length > 0) {
-  //     setErrors(allErrors);
-  //     setSnackbarMessage('Please fill in all required fields and check if you have entered all the date fields correctly');
-  //     setOpenSnackbar(true);
-  //     return;
-  //   }
-  //   try {
-  //     const response = await fetch(`${AppConfig.API_BASE_URL}/BasicDetails/AddBasicDetailsByAdmin`, {
-  //       method: 'POST',
-  //       headers: {
-  //         'Content-Type': 'application/json',
-  //       },
-  //       body: JSON.stringify(formData),
-  //     });
-
-  //     const data = await response.json();
-  //     if (data.ResponseCode === 1) {
-  //       alert('Details added successfully');
-  //       onSubmit();
-  //     } else {
-  //       alert(data.Message || 'Failed to add details');
-  //     }
-  //   } catch (error) {
-  //     console.error('Error adding details:', error);
-  //     alert('An error occurred while adding details');
-  //   }
-  // };
 
   const handleChange = (section: keyof FormData, field: string) => (event: React.ChangeEvent<HTMLInputElement>) => {
     const newValue = event.target.value;
@@ -851,25 +680,10 @@ export default function AddMemberDetails({ member, onBack, onSubmit }: AddMember
     }));
   };
 
-  // const handleChange = (section: keyof FormData, field: string) => (event: React.ChangeEvent<HTMLInputElement>) => {
-  //   const newValue = event.target.value;
-  
-  //   setErrors((prev) => ({
-  //     ...prev,
-  //     [field]: '', // Clear error when user starts typing
-  //   }));
-  
-  //   setFormData((prev) => ({
-  //     ...prev,
-  //     [section]: {
-  //       ...prev[section],
-  //       [field]: newValue,
-  //     },
-  //   }));
-  // };
   const handleCloseSnackbar = () => {
-    setOpenSnackbar(false);
+    setSnackbarOpen(false);
   };
+
   return (
     <Box sx={{ height: '100%', display: 'flex', flexDirection: 'column' }}>
       <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2, mr: 5}}>
@@ -889,18 +703,14 @@ export default function AddMemberDetails({ member, onBack, onSubmit }: AddMember
         </Tabs>
       </Box>
       <Snackbar
-        open={openSnackbar}
-        autoHideDuration={6000}
+        open={snackbarOpen}
+        autoHideDuration={4000}
         onClose={handleCloseSnackbar}
-        anchorOrigin={{ vertical: 'top', horizontal: 'center' }}
+        anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}
       >
-        <Alert 
-          onClose={handleCloseSnackbar} 
-          severity="error" 
-          sx={{ width: '100%' }}
-        >
+        <MuiAlert onClose={handleCloseSnackbar} severity={snackbarSeverity} sx={{ width: '100%' }}>
           {snackbarMessage}
-        </Alert>
+        </MuiAlert>
       </Snackbar>
       <Box component="form" onSubmit={handleSubmit} sx={{ flexGrow: 1, overflow: 'auto', p: 3 }}>
         {activeTab === 0 && (

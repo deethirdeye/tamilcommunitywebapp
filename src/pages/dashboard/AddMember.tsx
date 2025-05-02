@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
-import { Box, Typography, Button, Paper, Grid, TextField, MenuItem, InputAdornment, IconButton } from '@mui/material';
+import { Box, Typography, Button, Paper, Grid, TextField, MenuItem, InputAdornment, IconButton, Snackbar } from '@mui/material';
 import { Visibility, VisibilityOff } from '@mui/icons-material';
+import MuiAlert, { AlertColor } from '@mui/material/Alert';
 import AppConfig from '../../AppConfig';
 
 interface AddMemberProps {
@@ -31,6 +32,10 @@ export default function AddMember({ onBack }: AddMemberProps) {
   });
 
   const [showPassword, setShowPassword] = useState(false);
+
+  const [snackbarOpen, setSnackbarOpen] = useState(false);
+  const [snackbarMessage, setSnackbarMessage] = useState('');
+  const [snackbarSeverity, setSnackbarSeverity] = useState<AlertColor>('success');
 
   const maxLengths = {
     fullName: 50,
@@ -85,6 +90,12 @@ export default function AddMember({ onBack }: AddMemberProps) {
     return Object.values(newErrors).every((error) => error === '');
   };
 
+  const showSnackbar = (message: string, severity: AlertColor = 'success') => {
+    setSnackbarMessage(message);
+    setSnackbarSeverity(severity);
+    setSnackbarOpen(true);
+  };
+
   const handleChange = (event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = event.target;
 
@@ -114,6 +125,7 @@ export default function AddMember({ onBack }: AddMemberProps) {
   const handleSubmit = async (event: React.FormEvent) => {
     event.preventDefault();
     if (!validateForm()) {
+      showSnackbar('Please correct the errors in the form.', 'error');
       return;
     }
 
@@ -135,14 +147,16 @@ export default function AddMember({ onBack }: AddMemberProps) {
 
       const data = await response.json();
       if (data.ResponseCode === 1) {
-        alert('Member added successfully');
+        showSnackbar('Member added successfully!', 'success');
         onBack();
+        setFormData({ fullName: '', email: '', countryCode: '+60', mobileNumber: '', password: '' });
+        setErrors({ fullName: '', email: '', mobileNumber: '', password: '' });
+       
       } else {
-        alert(data.Message || 'Failed to add member');
+        showSnackbar(data.Message || 'Failed to add member', 'error');
       }
     } catch (error) {
-      console.error('Error adding member:', error);
-      alert('An error occurred while adding member');
+      showSnackbar('An error occurred while adding member', 'error');
     }
   };
 
@@ -258,6 +272,16 @@ export default function AddMember({ onBack }: AddMemberProps) {
           </Grid>
         </form>
       </Paper>
+      <Snackbar
+        open={snackbarOpen}
+        autoHideDuration={4000}
+        onClose={() => setSnackbarOpen(false)}
+        anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}
+      >
+        <MuiAlert onClose={() => setSnackbarOpen(false)} severity={snackbarSeverity} sx={{ width: '100%' }}>
+          {snackbarMessage}
+        </MuiAlert>
+      </Snackbar>
     </Box>
   );
 }
