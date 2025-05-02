@@ -31,7 +31,8 @@ import InputAdornment from '@mui/material/InputAdornment';
 import { Visibility, VisibilityOff } from '@mui/icons-material';
 import AppConfig from '../../AppConfig';
 import { ApiEndpoints } from '../../APIEndpoint';
-
+import MuiAlert, { AlertColor } from '@mui/material/Alert';
+import Snackbar from '@mui/material/Snackbar';
 
 interface User {
   id: string;
@@ -84,6 +85,9 @@ export default function AdminUser() {
   const [validationErrors, setValidationErrors] = React.useState<Partial<Record<keyof User, string>>>({});
   const [showEditPassword, setShowEditPassword] = React.useState(false);
   const [showAddUserPassword, setShowAddUserPassword] = React.useState(false);
+  const [snackbarOpen, setSnackbarOpen] = React.useState(false);
+  const [snackbarMessage, setSnackbarMessage] = React.useState('');
+  const [snackbarSeverity, setSnackbarSeverity] = React.useState<AlertColor>('success');
   const fetchUsers = async () => {
     try {
       const response = await fetch(`${AppConfig.API_BASE_URL}${ApiEndpoints.GetUserMaster}`);
@@ -113,13 +117,14 @@ export default function AdminUser() {
   useEffect(() => {
     fetchUsers();
   }, []);
-const validateUpdatePasswordFields = () => {
-  const newErrors = {
-    newPassword: newPassword ? '' : 'New password is required',
+
+  const validateUpdatePasswordFields = () => {
+    const newErrors = {
+      newPassword: newPassword ? '' : 'New password is required',
+    };
+    setErrors(newErrors);
+    return Object.values(newErrors).every((error) => error === '');
   };
-  setErrors(newErrors);
-  return Object.values(newErrors).every((error) => error === '');
-};
 
   const validateUser  = () => {
     const errors: Partial<Record<keyof User, string>> = {};
@@ -266,8 +271,10 @@ return Object.keys(errors).length === 0;
         const data = await response.json();
         if (data.ResponseCode === 1) {
           await fetchUsers(); // Refresh the user list
+          showSnackbar('User updated successfully', 'success');
           console.log('User updated successfully:', data.Message);
         } else {
+          showSnackbar(data.ErrorDesc || 'Error updating user', 'error');
           console.error('Error updating user:', data.ErrorDesc);
         }
       } catch (error) {
@@ -339,15 +346,14 @@ return Object.keys(errors).length === 0;
         const data = await response.json();
         if (data.ResponseCode === 1) {
           console.log('Password updated successfully');
-          // Show success message to user
-          alert('Password updated successfully');
+          showSnackbar('Password updated successfully', 'success');
         } else {
           console.error('Error updating password:', data.ErrorDesc);
-          alert('Failed to update password');
+          showSnackbar(data.ErrorDesc || 'Failed to update password', 'error');
         }
       } catch (error) {
         console.error('Error updating password:', error);
-        alert('An error occurred while updating password');
+        showSnackbar('An error occurred while updating password', 'error');
       }
 
       setPasswordConfirmDialogOpen(false);
@@ -411,26 +417,26 @@ return Object.keys(errors).length === 0;
       const data = await response.json();
       if (data.ResponseCode === 1) {
         await fetchUsers();
-        alert('User added successfully');
+        showSnackbar('User added successfully', 'success');
         setAddUserConfirmDialogOpen(false);
         setNewUser({});
       } else if (data.ResponseCode === 2) {
         if (data.Message.toLowerCase().includes('mobile')) {
-          alert('Mobile number already exists. Please use a different mobile number.');
+          showSnackbar('Mobile number already exists. Please use a different mobile number.', 'error');
         } else if (data.Message.toLowerCase().includes('email')) {
-          alert('Email already exists. Please use a different email address.');
+          showSnackbar('Email already exists. Please use a different email address.', 'error');
         } else {
-          alert(data.Message || 'Failed to add user');
+          showSnackbar(data.Message || 'Failed to add user', 'error');
         }
         setAddUserConfirmDialogOpen(false);
         setAddUserDialogOpen(true);
       } else {
-        alert(data.ErrorDesc || 'Failed to add user');
+        showSnackbar(data.ErrorDesc || 'Failed to add user', 'error');
         setAddUserConfirmDialogOpen(false);
       }
     } catch (error) {
       console.error('Error adding user:', error);
-      alert('An error occurred while adding the user');
+      showSnackbar('An error occurred while adding the user', 'error');
       setAddUserConfirmDialogOpen(false);
     }
   };
@@ -500,6 +506,12 @@ return Object.keys(errors).length === 0;
       ),
     },
   ];
+
+  const showSnackbar = (message: string, severity: AlertColor = 'success') => {
+    setSnackbarMessage(message);
+    setSnackbarSeverity(severity);
+    setSnackbarOpen(true);
+  };
 
   return (
     <Paper
@@ -839,6 +851,16 @@ return Object.keys(errors).length === 0;
           </Button>
         </DialogActions>
       </Dialog>
+      <Snackbar
+        open={snackbarOpen}
+        autoHideDuration={4000}
+        onClose={() => setSnackbarOpen(false)}
+        anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}
+      >
+        <MuiAlert onClose={() => setSnackbarOpen(false)} severity={snackbarSeverity} sx={{ width: '100%' }}>
+          {snackbarMessage}
+        </MuiAlert>
+      </Snackbar>
     </Paper>
   );
 }

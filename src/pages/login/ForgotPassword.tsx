@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Box, Typography, TextField, Button, Link } from '@mui/material';
+import { Box, Typography, TextField, Button, Link, Snackbar, Alert } from '@mui/material';
 import useStyles from '../../styles/styles';
 import AppConfig from '../../AppConfig';
 
@@ -13,6 +13,7 @@ const ForgotPassword: React.FC<ForgotPasswordProps> = ({ onBackToLogin, onVerifi
   const [email, setEmail] = useState('');
   const [emailError, setEmailError] = useState('');
   const [isLoading, setIsLoading] = useState(false);
+  const [snackbar, setSnackbar] = useState({ open: false, message: '', severity: 'success' as 'success' | 'error' });
 
   const validateEmail = (email: string) => {
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -41,14 +42,14 @@ const ForgotPassword: React.FC<ForgotPasswordProps> = ({ onBackToLogin, onVerifi
       const data = await response.json();
 
       if (data.ResponseCode === 1) {
-        alert('Verification code has been sent to your email');
+        setSnackbar({ open: true, message: 'Verification code has been sent to your email', severity: 'success' });
         onVerificationSent(email);
       } else {
-        alert(data.ErrorDesc || 'This email is not registered with us');
+        setSnackbar({ open: true, message: data.ErrorDesc || 'This email is not registered with us', severity: 'error' });
       }
     } catch (error) {
       console.error('Error:', error);
-      alert('This email is not registered with us');
+      setSnackbar({ open: true, message: 'This email is not registered with us', severity: 'error' });
     } finally {
       setIsLoading(false);
     }
@@ -87,6 +88,16 @@ const ForgotPassword: React.FC<ForgotPasswordProps> = ({ onBackToLogin, onVerifi
       <Link href="#" className={classes.forgotPassword} onClick={onBackToLogin}>
         ← Back to Login
       </Link>
+      <Snackbar
+        open={snackbar.open}
+        autoHideDuration={4000}
+        onClose={() => setSnackbar({ ...snackbar, open: false })}
+        anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}
+      >
+        <Alert onClose={() => setSnackbar({ ...snackbar, open: false })} severity={snackbar.severity} sx={{ width: '100%' }}>
+          {snackbar.message}
+        </Alert>
+      </Snackbar>
     </Box>
   );
 };

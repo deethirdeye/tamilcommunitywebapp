@@ -21,6 +21,7 @@ import AppConfig from '../../AppConfig';
 import PlayArrowIcon from '@mui/icons-material/PlayArrow';
 import PauseIcon from '@mui/icons-material/Pause';
 import StopIcon from '@mui/icons-material/Stop';
+import { Snackbar, Alert } from '@mui/material';
 
 // Mock data - replace this with actual data fetching logic
 
@@ -192,6 +193,7 @@ export default function AidView({ requestId, onBack }: AidViewProps) {
   const [isPlaying, setIsPlaying] = useState(false);
   const [duration, setDuration] = useState(0);
   const [currentTime, setCurrentTime] = useState(0);
+  const [snackbar, setSnackbar] = useState({ open: false, message: '', severity: 'success' as 'success' | 'error' });
 
   const userCode = localStorage.getItem('userCode'); 
   console.log("usercode is ",userCode);
@@ -543,7 +545,7 @@ export default function AidView({ requestId, onBack }: AidViewProps) {
       }
     } catch (error) {
       console.error('Error fetching member details:', error);
-      alert('Error accessing member details');
+      setSnackbar({ open: true, message: 'Error accessing member details', severity: 'error' });
     }
   };
 
@@ -910,6 +912,16 @@ export default function AidView({ requestId, onBack }: AidViewProps) {
           </Button>
         </DialogActions>
       </Dialog>
+      <Snackbar
+        open={snackbar.open}
+        autoHideDuration={4000}
+        onClose={() => setSnackbar({ ...snackbar, open: false })}
+        anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}
+      >
+        <Alert onClose={() => setSnackbar({ ...snackbar, open: false })} severity={snackbar.severity} sx={{ width: '100%' }}>
+          {snackbar.message}
+        </Alert>
+      </Snackbar>
     </Box>
   );
 }
