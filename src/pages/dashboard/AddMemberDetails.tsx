@@ -322,7 +322,7 @@ export default function AddMemberDetails({ member, onBack, onSubmit }: AddMember
     if (!nativeContactPhone) {
       nativeErrors.NativeContactPersonPhone = 'Contact Person Phone is required';
     } else if (!/^\d{8,15}$/.test(nativeContactPhone)) {
-      nativeErrors.NativeContactPersonPhone = 'Contact Person Phone must be 8-15 digits';
+      nativeErrors.NativeContactPersonPhone = 'Contact Person Phone must be 8-15 digits,do not add + sign';
     }
   
     return nativeErrors;
@@ -376,7 +376,7 @@ export default function AddMemberDetails({ member, onBack, onSubmit }: AddMember
     if (!workContactPhone) {
       workErrors.MalaysiaWorkContactPersonPhone = 'Contact Person Phone is required';
     } else if (!/^\d{8,15}$/.test(workContactPhone)) {
-      workErrors.MalaysiaWorkContactPersonPhone = 'Contact Person Phone must be 8-15 digits';
+      workErrors.MalaysiaWorkContactPersonPhone = 'Contact Person Phone must be 8-15 digits,do not add + sign';
     }
   
     return workErrors;
@@ -430,7 +430,7 @@ export default function AddMemberDetails({ member, onBack, onSubmit }: AddMember
     if (!malaysiaContactPhone) {
       residenceErrors.MalaysiaContactPersonPhone = 'Contact Person Phone is required';
     } else if (!/^\d{8,15}$/.test(malaysiaContactPhone)) {
-      residenceErrors.MalaysiaContactPersonPhone = 'Contact Person Phone must be 8-15 digits';
+      residenceErrors.MalaysiaContactPersonPhone = 'Contact Person Phone must be 8-15 digits,do not add + sign';
     }
   
     return residenceErrors;
@@ -1282,8 +1282,8 @@ export default function AddMemberDetails({ member, onBack, onSubmit }: AddMember
               label="Mobile Number"
               value={formData.employerDetails.MobileNumber}
               onChange={handleChange('employerDetails', 'MobileNumber')}
-              error={!!errors.MobileNumberemp}
-              helperText={errors.MobileNumberemp}
+              error={!!errors.MobileNumber}
+              helperText={errors.MobileNumber}
               inputProps={{
                 maxLength: 15, // Ensure the input doesn't exceed 15 characters
                 pattern: '[0-9]*', // Restrict input to digits only
