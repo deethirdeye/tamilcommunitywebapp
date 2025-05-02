@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { 
   DataGrid, 
   GridColDef, 
@@ -27,6 +27,8 @@ import MenuItem from '@mui/material/MenuItem';
 import FormControl from '@mui/material/FormControl';
 import InputLabel from '@mui/material/InputLabel';
 import Link from '@mui/material/Link';
+import InputAdornment from '@mui/material/InputAdornment';
+import { Visibility, VisibilityOff } from '@mui/icons-material';
 import AppConfig from '../../AppConfig';
 import { ApiEndpoints } from '../../APIEndpoint';
 
@@ -80,6 +82,8 @@ export default function AdminUser() {
     newPassword: '',
   });
   const [validationErrors, setValidationErrors] = React.useState<Partial<Record<keyof User, string>>>({});
+  const [showEditPassword, setShowEditPassword] = React.useState(false);
+  const [showAddUserPassword, setShowAddUserPassword] = React.useState(false);
   const fetchUsers = async () => {
     try {
       const response = await fetch(`${AppConfig.API_BASE_URL}${ApiEndpoints.GetUserMaster}`);
@@ -614,6 +618,7 @@ return Object.keys(errors).length === 0;
               name="role"
               value={editingUser?.role || ''}
               onChange={handleInputChange}
+              error={!editingUser?.role}
             >
               <MenuItem value="Super Admin">Super Admin</MenuItem>
               <MenuItem value="Admin">Admin</MenuItem>
@@ -627,6 +632,7 @@ return Object.keys(errors).length === 0;
               name="status"
               value={editingUser?.status || ''}
               onChange={handleInputChange}
+              error={!editingUser?.status}
             >
               <MenuItem value="Active">Active</MenuItem>
               <MenuItem value="Inactive">Inactive</MenuItem>
@@ -662,13 +668,26 @@ return Object.keys(errors).length === 0;
           <TextField
             margin="dense"
             label="New Password"
-            type="password"
+            type={showEditPassword ? 'text' : 'password'}
             fullWidth
             value={newPassword}
             onChange={(e) => setNewPassword(e.target.value)}
             required
             error={!!errors.newPassword}
             helperText={errors.newPassword}
+            InputProps={{
+              endAdornment: (
+                <InputAdornment position="end">
+                  <IconButton
+                    aria-label="toggle password visibility"
+                    onClick={() => setShowEditPassword((prev) => !prev)}
+                    edge="end"
+                  >
+                    {showEditPassword ? <VisibilityOff /> : <Visibility />}
+                  </IconButton>
+                </InputAdornment>
+              )
+            }}
           />
         </DialogContent>
         <DialogActions>
@@ -738,38 +757,55 @@ return Object.keys(errors).length === 0;
             margin="dense"
             name="password"
             label="Password"
-            type="password"
+            type={showAddUserPassword ? 'text' : 'password'}
             fullWidth
             value={newUser.password || ''}
             onChange={handleAddUserInputChange}
             error={!!validationErrors.password}
             helperText={validationErrors.password}
+            InputProps={{
+              endAdornment: (
+                <InputAdornment position="end">
+                  <IconButton
+                    aria-label="toggle password visibility"
+                    onClick={() => setShowAddUserPassword((prev) => !prev)}
+                    edge="end"
+                  >
+                    {showAddUserPassword ? <VisibilityOff /> : <Visibility />}
+                  </IconButton>
+                </InputAdornment>
+              )
+            }}
           />
-          <FormControl fullWidth margin="dense">
+          <FormControl fullWidth margin="dense" error={!!validationErrors.role}>
             <InputLabel>Role</InputLabel>
             <Select
               name="role"
               value={newUser.role || ''}
               onChange={handleAddUserInputChange}
-            >  error={!!validationErrors.role}
+            >
               <MenuItem value="Super Admin">Super Admin</MenuItem>
               <MenuItem value="Admin">Admin</MenuItem>
               <MenuItem value="Manager">Manager</MenuItem>
               <MenuItem value="Associate">Associate</MenuItem>
             </Select>
+            {validationErrors.role && (
+              <span style={{ color: '#d32f2f', fontSize: 12 }}>{validationErrors.role}</span>
+            )}
           </FormControl>
-          <FormControl fullWidth margin="dense">
+          <FormControl fullWidth margin="dense" error={!!validationErrors.status}>
             <InputLabel>Status</InputLabel>
             <Select
               name="status"
               value={newUser.status || ''}
               onChange={handleAddUserInputChange}
-            
             >
               <MenuItem value="Active">Active</MenuItem>
               <MenuItem value="Inactive">Inactive</MenuItem>
-              error={!!validationErrors.status}
             </Select>
+            {validationErrors.status && (
+              <span style={{ color: '#d32f2f', fontSize: 12 }}>{validationErrors.status}</span>
+            )}
           </FormControl>
         </DialogContent>
         <DialogActions>

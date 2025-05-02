@@ -98,8 +98,7 @@ const AudioControls = ({ recordingPath }: { recordingPath: string }) => {
 
   useEffect(() => {
     const audioElement = new Audio(recordingPath);
-    console.log("recordingPath",recordingPath);
-    console.log("audioElement",audioElement);
+    
     audioElement.addEventListener('ended', () => {
       setIsPlaying(false);
     });
@@ -688,6 +687,9 @@ export default function AidView({ requestId, onBack }: AidViewProps) {
 
   console.log('Current comments state:', comments);
 
+  // Sort comments by CreatedOn descending (latest first)
+  const sortedComments = [...comments].sort((a, b) => new Date(b.CreatedOn).getTime() - new Date(a.CreatedOn).getTime());
+
   return (
     <Box sx={{ height: '100%', display: 'flex', flexDirection: 'column' }}>
       
@@ -765,7 +767,7 @@ export default function AidView({ requestId, onBack }: AidViewProps) {
           )}
           <Typography variant="h6" sx={{ mt: 2, mb: 1 }}>Comments</Typography>
           <List sx={{ borderRadius: 1, p: 2 }}>
-         { comments.map((comment) => (
+         { sortedComments.map((comment) => (
           <ListItem 
             key={`cmt-${comment.CommentID}`}
             alignItems="flex-start" 
