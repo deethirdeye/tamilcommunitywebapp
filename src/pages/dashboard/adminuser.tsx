@@ -345,14 +345,14 @@ return Object.keys(errors).length === 0;
 
         const data = await response.json();
         if (data.ResponseCode === 1) {
-          console.log('Password updated successfully');
+        
           showSnackbar('Password updated successfully', 'success');
         } else {
           console.error('Error updating password:', data.ErrorDesc);
           showSnackbar(data.ErrorDesc || 'Failed to update password', 'error');
         }
       } catch (error) {
-        console.error('Error updating password:', error);
+      
         showSnackbar('An error occurred while updating password', 'error');
       }
 
@@ -695,7 +695,7 @@ return Object.keys(errors).length === 0;
                     onClick={() => setShowEditPassword((prev) => !prev)}
                     edge="end"
                   >
-                    {showEditPassword ? <VisibilityOff /> : <Visibility />}
+                    {showEditPassword ? <Visibility /> : <VisibilityOff />}
                   </IconButton>
                 </InputAdornment>
               )
@@ -783,7 +783,7 @@ return Object.keys(errors).length === 0;
                     onClick={() => setShowAddUserPassword((prev) => !prev)}
                     edge="end"
                   >
-                    {showAddUserPassword ? <VisibilityOff /> : <Visibility />}
+                    {showAddUserPassword ? <Visibility /> : <VisibilityOff />}
                   </IconButton>
                 </InputAdornment>
               )
