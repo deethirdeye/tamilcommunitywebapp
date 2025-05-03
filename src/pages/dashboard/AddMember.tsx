@@ -259,7 +259,7 @@ export default function AddMember({ onBack }: AddMemberProps) {
                         onClick={handleTogglePasswordVisibility}
                         edge="end"
                       >
-                        {showPassword ? <VisibilityOff /> : <Visibility />}
+                        {showPassword ? <Visibility />: <VisibilityOff />}
                       </IconButton>
                     </InputAdornment>
                   ),
