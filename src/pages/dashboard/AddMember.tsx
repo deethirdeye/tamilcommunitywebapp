@@ -148,9 +148,12 @@ export default function AddMember({ onBack }: AddMemberProps) {
       const data = await response.json();
       if (data.ResponseCode === 1) {
         showSnackbar('Member added successfully!', 'success');
-        onBack();
+      
         setFormData({ fullName: '', email: '', countryCode: '+60', mobileNumber: '', password: '' });
         setErrors({ fullName: '', email: '', mobileNumber: '', password: '' });
+        setTimeout(() => {
+          onBack();
+        }, 2000);
        
       } else {
         showSnackbar(data.Message || 'Failed to add member', 'error');
